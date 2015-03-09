@@ -24,11 +24,14 @@ defmodule Media.SnapshotController do
       [200, response]
     rescue
       error in [FunctionClauseError] ->
-        Logger.warn "#{inspect(error)}"
+        Logger.error "#{inspect(error)}"
         [401, fallback_jpg]
-      _error ->
-        Logger.warn "#{inspect(_error)}"
+      error in [HTTPotion.HTTPError] ->
+        Logger.error "#{inspect(error)}"
         [504, fallback_jpg]
+      _error ->
+        Logger.error "#{inspect(_error)}"
+        [500, fallback_jpg]
     end
   end
 
