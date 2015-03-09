@@ -10,6 +10,7 @@ config :media, Media.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "joIg696gDBw3ZjdFTkuWNz7s21nXrcRUkZn3Lsdp7pCNodzCMl/KymikuJVw0igG",
   debug_errors: false,
+  server: true,
   pubsub: [name: Media.PubSub,
            adapter: Phoenix.PubSub.PG2]
 

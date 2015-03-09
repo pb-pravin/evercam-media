@@ -10,7 +10,7 @@ defmodule Media do
       # Start the endpoint when the application starts
       supervisor(Media.Endpoint, []),
       # Start the Ecto repository
-      worker(Media.Repo, []),
+      # worker(Media.Repo, []),
       # Here you could define other workers and supervisors as children
       # worker(Media.Worker, [arg1, arg2, arg3]),
     ]

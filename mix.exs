@@ -15,7 +15,7 @@ defmodule Media.Mixfile do
   # Type `mix help compile.app` for more information
   def application do
     [mod: {Media, []},
-     applications: [:phoenix, :cowboy, :logger, :dotenv, :httpotion]]
+     applications: [:phoenix, :cowboy, :logger, :dotenv, :httpotion, :timex]]
   end
 
   # Specifies your project dependencies
@@ -29,6 +29,7 @@ defmodule Media.Mixfile do
      {:httpotion, "~> 1.0.0"},
      {:ibrowse, github: "cmullaparthi/ibrowse", tag: "v4.1.1"},
      {:dotenv, "~> 0.0.4"},
-     {:timex, "~> 0.13.3"}]
+     {:timex, "~> 0.13.3"},
+     {:exrm, "~> 0.14.16"}]
   end
 end

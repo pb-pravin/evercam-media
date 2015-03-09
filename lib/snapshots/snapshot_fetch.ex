@@ -10,6 +10,8 @@ defmodule Media.SnapshotFetch do
   end
 
   def fallback_jpg do
-    File.read!('./priv/static/images/offline.jpg')
+    path = Application.app_dir(:media)
+    path = Path.join path, "priv/static/images/unavailable.jpg"
+    File.read! path
   end
 end
