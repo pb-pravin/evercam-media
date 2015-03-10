@@ -3,7 +3,7 @@ defmodule Media.Mixfile do
 
   def project do
     [app: :media,
-     version: "0.0.1",
+     version: get_version,
      elixir: "~> 1.0",
      elixirc_paths: ["lib", "web"],
      compilers: [:phoenix] ++ Mix.compilers,
@@ -31,5 +31,17 @@ defmodule Media.Mixfile do
      {:dotenv, "~> 0.0.4"},
      {:timex, "~> 0.13.3"},
      {:exrm, "~> 0.14.16"}]
+  end
+
+  def get_version do
+    version = :os.cmd('git describe --always --tags')
+    |> List.to_string
+    |> String.strip(?\n)
+    |> String.split("-")
+
+    case version do
+      [tag] -> tag
+      [tag, _commits_since_tag, commit] -> "#{tag}-#{commit}"
+    end
   end
 end
