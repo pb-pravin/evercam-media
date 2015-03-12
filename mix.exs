@@ -15,8 +15,12 @@ defmodule Media.Mixfile do
   # Type `mix help compile.app` for more information
   def application do
     [mod: {Media, []},
-     applications: [:phoenix, :cowboy, :logger, :dotenv, :httpotion, :timex]]
+     applications: app_list(Mix.env)]
   end
+
+  defp app_list(:dev), do: [:dotenv | app_list]
+  defp app_list(_), do: app_list
+  defp app_list, do: [:phoenix, :cowboy, :logger, :dotenv, :httpotion, :timex]
 
   # Specifies your project dependencies
   #
@@ -33,7 +37,7 @@ defmodule Media.Mixfile do
      {:exrm, "~> 0.14.16"}]
   end
 
-  def get_version do
+  defp get_version do
     version = :os.cmd('git describe --always --tags')
     |> List.to_string
     |> String.strip(?\n)
