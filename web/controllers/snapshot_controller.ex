@@ -24,13 +24,13 @@ defmodule Media.SnapshotController do
       [200, response]
     rescue
       error in [FunctionClauseError] ->
-        Logger.error "#{inspect(error)}"
+        error_handler(error)
         [401, fallback_jpg]
       error in [HTTPotion.HTTPError] ->
-        Logger.error "#{inspect(error)}"
+        error_handler(error)
         [504, fallback_jpg]
       _error ->
-        Logger.error "#{inspect(_error)}"
+        error_handler(_error)
         [500, fallback_jpg]
     end
   end
@@ -59,6 +59,11 @@ defmodule Media.SnapshotController do
     if String.valid?(response) do
       raise "Response isn't an image"
     end
+  end
+
+  defp error_handler(error) do
+    Logger.error inspect(error)
+    Logger.error Exception.format_stacktrace System.stacktrace
   end
 end
 
