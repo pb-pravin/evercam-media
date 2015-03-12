@@ -20,7 +20,7 @@ defmodule Media.Mixfile do
 
   defp app_list(:dev), do: [:dotenv | app_list]
   defp app_list(_), do: app_list
-  defp app_list, do: [:phoenix, :cowboy, :logger, :dotenv, :httpotion, :timex]
+  defp app_list, do: [:phoenix, :cowboy, :logger, :httpotion, :timex]
 
   # Specifies your project dependencies
   #
