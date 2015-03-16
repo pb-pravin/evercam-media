@@ -7,8 +7,8 @@ use Mix.Config
 # You should also configure the url host to something
 # meaningful, we use this information when generating URLs.
 config :media, Media.Endpoint,
-  http: [port: {:system, "PORT"}],
-  url: [host: "example.com"]
+  http: [port: 4000],
+  url: [host: "evercam.io"]
 
 # ## SSL Support
 #
