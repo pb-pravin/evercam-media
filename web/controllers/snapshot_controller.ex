@@ -7,11 +7,20 @@ defmodule Media.SnapshotController do
 
   def show(conn, params) do
     [code, image] = snapshot(params["token"])
+    response(conn, code, image)
+  end
 
+  defp response(conn, 200, image) do
     conn
-    |> put_status(code)
+    |> put_status(200)
     |> put_resp_content_type("image/jpeg")
     |> text image
+  end
+
+  defp response(conn, code, _) do
+    conn
+    |> put_status(code)
+    |> text "We failed to retrieve a snapshot from the camera"
   end
 
   defp snapshot(token) do
@@ -66,4 +75,3 @@ defmodule Media.SnapshotController do
     Logger.error Exception.format_stacktrace System.stacktrace
   end
 end
-
