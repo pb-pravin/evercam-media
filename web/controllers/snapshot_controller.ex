@@ -66,7 +66,7 @@ defmodule Media.SnapshotController do
 
   defp check_jpg(response) do
     if String.valid?(response) do
-      raise "Response isn't an image"
+      raise HTTPotion.HTTPError, message: "Response isn't an image"
     end
   end
 
