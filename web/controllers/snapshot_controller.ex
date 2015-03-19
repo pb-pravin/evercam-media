@@ -13,13 +13,15 @@ defmodule Media.SnapshotController do
   defp response(conn, 200, image) do
     conn
     |> put_status(200)
-    |> put_resp_content_type("image/jpeg")
+    |> put_resp_header("Content-Type", "image/jpg")
+    |> put_resp_header("access-control-allow-origin", "*")
     |> text image
   end
 
   defp response(conn, code, _) do
     conn
     |> put_status(code)
+    |> put_resp_header("access-control-allow-origin", "*")
     |> text "We failed to retrieve a snapshot from the camera"
   end
 
