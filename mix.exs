@@ -20,7 +20,7 @@ defmodule Media.Mixfile do
 
   defp app_list(:dev), do: [:dotenv | app_list]
   defp app_list(_), do: app_list
-  defp app_list, do: [:phoenix, :cowboy, :logger, :httpotion, :timex]
+  defp app_list, do: [:phoenix, :cowboy, :logger, :httpotion, :timex, :porcelain]
 
   # Specifies your project dependencies
   #
@@ -34,6 +34,7 @@ defmodule Media.Mixfile do
      {:ibrowse, github: "cmullaparthi/ibrowse", tag: "v4.1.1"},
      {:dotenv, "~> 0.0.4"},
      {:timex, "~> 0.13.3"},
+     {:porcelain, "~> 2.0"},
      {:exrm, "~> 0.14.16"}]
   end
 
