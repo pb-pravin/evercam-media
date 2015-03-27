@@ -20,7 +20,7 @@ defmodule Media.Mixfile do
 
   defp app_list(:dev), do: [:dotenv | app_list]
   defp app_list(_), do: app_list
-  defp app_list, do: [:phoenix, :cowboy, :logger, :httpotion, :timex, :porcelain]
+  defp app_list, do: [:phoenix, :cowboy, :logger, :httpotion, :timex, :porcelain, :erlcloud]
 
   # Specifies your project dependencies
   #
@@ -30,11 +30,12 @@ defmodule Media.Mixfile do
      {:phoenix_ecto, "~> 0.1"},
      {:postgrex, ">= 0.0.0"},
      {:cowboy, "~> 1.0"},
-     {:httpotion, "~> 1.0.0"},
+     {:httpotion, github: "myfreeweb/httpotion"},
      {:ibrowse, github: "cmullaparthi/ibrowse", tag: "v4.1.1"},
      {:dotenv, "~> 0.0.4"},
      {:timex, "~> 0.13.3"},
      {:porcelain, "~> 2.0"},
+     {:erlcloud, github: 'gleber/erlcloud'},
      {:exrm, "~> 0.14.16"}]
   end
 

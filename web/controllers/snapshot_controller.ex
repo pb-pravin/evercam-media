@@ -7,10 +7,12 @@ defmodule Media.SnapshotController do
 
   def show(conn, params) do
     [code, image] = snapshot(params["token"])
-    response(conn, code, image)
+    response(conn, code, image, params["id"])
   end
 
-  defp response(conn, 200, image) do
+  defp response(conn, 200, image, camera_id) do
+    Task.async(fn -> store_image(image, camera_id) end)
+
     conn
     |> put_status(200)
     |> put_resp_header("Content-Type", "image/jpg")
@@ -18,7 +20,7 @@ defmodule Media.SnapshotController do
     |> text image
   end
 
-  defp response(conn, code, _) do
+  defp response(conn, code, _, _) do
     conn
     |> put_status(code)
     |> put_resp_header("access-control-allow-origin", "*")
