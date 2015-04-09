@@ -2,7 +2,6 @@ defmodule Media.SnapshotController do
   use Phoenix.Controller
   use Timex
   import Media.SnapshotFetch
-  require Logger
   plug :action
 
   def show(conn, params) do
@@ -66,16 +65,5 @@ defmodule Media.SnapshotController do
     if Date.now > token_time do
       raise FunctionClauseError
     end
-  end
-
-  defp check_jpg(response) do
-    if String.valid?(response) do
-      raise HTTPotion.HTTPError, message: "Response isn't an image"
-    end
-  end
-
-  defp error_handler(error) do
-    Logger.error inspect(error)
-    Logger.error Exception.format_stacktrace System.stacktrace
   end
 end

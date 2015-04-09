@@ -36,6 +36,9 @@ defmodule Media.Mixfile do
      {:timex, "~> 0.13.3"},
      {:porcelain, "~> 2.0"},
      {:erlcloud, github: 'gleber/erlcloud'},
+     {:exq, github: "akira/exq"},
+     {:eredis, github: 'wooga/eredis', tag: 'v1.0.5'},
+     {:uuid, github: 'zyro/elixir-uuid', override: true},
      {:exrm, "~> 0.14.16"}]
   end
 

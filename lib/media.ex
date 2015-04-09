@@ -7,12 +7,9 @@ defmodule Media do
     import Supervisor.Spec, warn: false
 
     children = [
-      # Start the endpoint when the application starts
       supervisor(Media.Endpoint, []),
-      # Start the Ecto repository
-      # worker(Media.Repo, []),
-      # Here you could define other workers and supervisors as children
-      # worker(Media.Worker, [arg1, arg2, arg3]),
+      supervisor(Exq.Manager.Supervisor, []),
+      supervisor(Media.Worker.Supervisor, []),
     ]
 
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html
