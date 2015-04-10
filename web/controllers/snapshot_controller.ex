@@ -10,7 +10,7 @@ defmodule Media.SnapshotController do
   end
 
   defp response(conn, 200, image, camera_id) do
-    Task.async(fn -> store_image(image, camera_id) end)
+    Task.async(fn -> store_image(camera_id, image) end)
 
     conn
     |> put_status(200)

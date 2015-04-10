@@ -25,7 +25,7 @@ defmodule Media.Worker do
     try do
       response = fetch_snapshot(args[:url], args[:auth])
       check_jpg(response)
-      store_image(response, args[:camera_id])
+      store_image(args[:camera_id], response)
     rescue
       error in [FunctionClauseError] ->
         error_handler(error)

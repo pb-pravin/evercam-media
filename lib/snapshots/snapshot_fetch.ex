@@ -1,4 +1,5 @@
 defmodule Media.SnapshotFetch do
+  alias Media.S3
   require Logger
 
   def fetch_snapshot(url, ":") do
@@ -22,22 +23,11 @@ defmodule Media.SnapshotFetch do
     File.read! path
   end
 
-  def store_image(image, camera_id, count \\ 1) do
+  def store_image(camera_id, image, count \\ 1) do
     try do
       timestamp = Timex.Date.convert Timex.Date.now, :secs
       file_path = "#{camera_id}/snapshots/#{timestamp}.jpg"
-
-      :erlcloud_s3.configure(
-        to_char_list(System.get_env["AWS_ACCESS_KEY"]),
-        to_char_list(System.get_env["AWS_SECRET_KEY"])
-      )
-      :erlcloud_s3.put_object(
-        to_char_list(System.get_env["AWS_BUCKET"]),
-        to_char_list(file_path),
-        image,
-        [],
-        []
-      )
+      S3.upload(camera_id, image, file_path, timestamp)
 
       Exq.Enqueuer.enqueue(
         :exq_enqueuer,
@@ -49,8 +39,9 @@ defmodule Media.SnapshotFetch do
     rescue
       _error ->
         :timer.sleep 1_000
+        error_handler(_error)
         Logger.warn "Retrying S3 upload for camera '#{camera_id}', try ##{count}"
-        store_image(image, camera_id, count+1)
+        store_image(camera_id, image, count+1)
     end
   end
 
