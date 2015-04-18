@@ -6,7 +6,7 @@ use Mix.Config
 #
 # You should also configure the url host to something
 # meaningful, we use this information when generating URLs.
-config :media, Media.Endpoint,
+config :evercam_media, EvercamMedia.Endpoint,
   http: [port: 4000],
   url: [host: "evercam.io"]
 
@@ -15,7 +15,7 @@ config :media, Media.Endpoint,
 # To get SSL working, you will need to add the `https` key
 # to the previous section:
 #
-#  config:media, Media.Endpoint,
+#  config:evercam_media, EvercamMedia.Endpoint,
 #    ...
 #    https: [port: 443,
 #            keyfile: System.get_env("SOME_APP_SSL_KEY_PATH"),
@@ -37,7 +37,7 @@ config :logger, level: :info
 # Alternatively, you can configure exactly which server to
 # start per endpoint:
 #
-#     config :media, Media.Endpoint, server: true
+#     config :evercam_media, EvercamMedia.Endpoint, server: true
 #
 
 # Finally import the config/prod.secret.exs

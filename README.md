@@ -1,4 +1,4 @@
-# Media
+# EvercamMedia
 
 To start your new Phoenix application:
 

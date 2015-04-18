@@ -1,3 +1,17 @@
-defmodule Media.LayoutView do
-  use Media.Web, :view
+defmodule EvercamMedia.LayoutView do
+  use EvercamMedia.Web, :view
 end
+
+
+
+
+
+
+
+
+
+
+
+
+
+

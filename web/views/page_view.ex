@@ -1,3 +1,3 @@
-defmodule Media.PageView do
-  use Media.Web, :view
+defmodule EvercamMedia.PageView do
+  use EvercamMedia.Web, :view
 end

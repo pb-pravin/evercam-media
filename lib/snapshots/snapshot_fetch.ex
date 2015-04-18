@@ -1,4 +1,4 @@
-defmodule Media.SnapshotFetch do
+defmodule EvercamMedia.SnapshotFetch do
   alias Media.S3
   require Logger
 
@@ -18,7 +18,7 @@ defmodule Media.SnapshotFetch do
   end
 
   def fallback_jpg do
-    path = Application.app_dir(:media)
+    path = Application.app_dir(:evercam_media)
     path = Path.join path, "priv/static/images/unavailable.jpg"
     File.read! path
   end
