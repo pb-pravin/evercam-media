@@ -1,8 +1,8 @@
-defmodule Media.Mixfile do
+defmodule EvercamMedia.Mixfile do
   use Mix.Project
 
   def project do
-    [app: :media,
+    [app: :evercam_media,
      version: get_version,
      elixir: "~> 1.0",
      elixirc_paths: ["lib", "web"],
@@ -14,7 +14,7 @@ defmodule Media.Mixfile do
   #
   # Type `mix help compile.app` for more information
   def application do
-    [mod: {Media, []},
+    [mod: {EvercamMedia, []},
      applications: app_list(Mix.env)]
   end
 

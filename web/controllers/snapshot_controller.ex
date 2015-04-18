@@ -1,7 +1,7 @@
-defmodule Media.SnapshotController do
+defmodule EvercamMedia.SnapshotController do
   use Phoenix.Controller
   use Timex
-  import Media.SnapshotFetch
+  import EvercamMedia.SnapshotFetch
   require Logger
   plug :action
 

@@ -1,5 +1,5 @@
-defmodule Media.ErrorView do
-  use Media.Web, :view
+defmodule EvercamMedia.ErrorView do
+  use EvercamMedia.Web, :view
 
   def render("404.html", _assigns) do
     "Page not found - 404"

@@ -1,4 +1,4 @@
-defmodule Media.SnapshotFetch do
+defmodule EvercamMedia.SnapshotFetch do
   def fetch_snapshot(url, ":") do
     HTTPotion.get(url).body
   end
@@ -15,7 +15,7 @@ defmodule Media.SnapshotFetch do
   end
 
   def fallback_jpg do
-    path = Application.app_dir(:media)
+    path = Application.app_dir(:evercam_media)
     path = Path.join path, "priv/static/images/unavailable.jpg"
     File.read! path
   end

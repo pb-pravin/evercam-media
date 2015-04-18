@@ -1,9 +1,9 @@
-defmodule Media.Endpoint do
-  use Phoenix.Endpoint, otp_app: :media
+defmodule EvercamMedia.Endpoint do
+  use Phoenix.Endpoint, otp_app: :evercam_media
 
   # Serve at "/" the given assets from "priv/static" directory
   plug Plug.Static,
-    at: "/", from: :media,
+    at: "/", from: :evercam_media,
     only: ~w(css images js favicon.ico robots.txt)
 
   plug Plug.Logger
@@ -26,5 +26,5 @@ defmodule Media.Endpoint do
     signing_salt: "sZRQyVW1",
     encryption_salt: "awIwE/dg"
 
-  plug :router, Media.Router
+  plug :router, EvercamMedia.Router
 end

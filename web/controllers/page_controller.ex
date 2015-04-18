@@ -1,5 +1,5 @@
-defmodule Media.PageController do
-  use Media.Web, :controller
+defmodule EvercamMedia.PageController do
+  use EvercamMedia.Web, :controller
 
   plug :action
 

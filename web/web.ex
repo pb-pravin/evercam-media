@@ -1,12 +1,12 @@
-defmodule Media.Web do
+defmodule EvercamMedia.Web do
   @moduledoc """
   A module that keeps using definitions for controllers,
   views and so on.
 
   This can be used in your application as:
 
-      use Media.Web, :controller
-      use Media.Web, :view
+      use EvercamMedia.Web, :controller
+      use EvercamMedia.Web, :view
 
   Keep the definitions in this module short and clean,
   mostly focused on imports, uses and aliases.
@@ -17,7 +17,7 @@ defmodule Media.Web do
       use Phoenix.View, root: "web/templates"
 
       # Import URL helpers from the router
-      import Media.Router.Helpers
+      import EvercamMedia.Router.Helpers
 
       # Import all HTML functions (forms, tags, etc)
       use Phoenix.HTML
@@ -29,10 +29,10 @@ defmodule Media.Web do
       use Phoenix.Controller
 
       # Alias the data repository as a convenience
-      alias Media.Repo
+      alias EvercamMedia.Repo
 
       # Import URL helpers from the router
-      import Media.Router.Helpers
+      import EvercamMedia.Router.Helpers
     end
   end
 

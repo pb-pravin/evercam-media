@@ -1,4 +1,4 @@
-defmodule Media.Router do
+defmodule EvercamMedia.Router do
   use Phoenix.Router
 
   pipeline :browser do
@@ -12,7 +12,7 @@ defmodule Media.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/", Media do
+  scope "/", EvercamMedia do
     pipe_through :browser # Use the default browser stack
 
     get "/", PageController, :index
@@ -21,7 +21,7 @@ defmodule Media.Router do
   end
 
   # Other scopes may use custom stacks.
-  # scope "/api", Media do
+  # scope "/api", EvercamMedia do
   #   pipe_through :api
   # end
 end
