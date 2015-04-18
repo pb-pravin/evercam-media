@@ -1,9 +1,9 @@
-defmodule EvercamMedia.SnapshotFetch do
-  def fetch_snapshot(url, ":") do
+defmodule EvercamMedia.Snapshot do
+  def fetch(url, ":") do
     HTTPotion.get(url).body
   end
 
-  def fetch_snapshot(url, auth) do
+  def fetch(url, auth) do
     [username, password] = String.split(auth, ":")
     request = HTTPotion.get(url, [basic_auth: {username, password}])
     if request.status_code == 401 do
@@ -14,13 +14,13 @@ defmodule EvercamMedia.SnapshotFetch do
     end
   end
 
-  def fallback_jpg do
+  def fallback do
     path = Application.app_dir(:evercam_media)
     path = Path.join path, "priv/static/images/unavailable.jpg"
     File.read! path
   end
 
-  def store_image(image, camera_id) do
+  def store(image, camera_id) do
     timestamp = Timex.Date.convert Timex.Date.now, :secs
     file_path = "#{camera_id}/snapshots/#{timestamp}.jpg"
 
