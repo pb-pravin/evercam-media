@@ -1,7 +1,7 @@
 defmodule EvercamMedia.SnapshotController do
   use Phoenix.Controller
   use Timex
-  import EvercamMedia.SnapshotFetch
+  import EvercamMedia.Snapshot
   require Logger
   plug :action
 
@@ -11,7 +11,7 @@ defmodule EvercamMedia.SnapshotController do
   end
 
   defp response(conn, 200, image, camera_id) do
-    Task.async(fn -> store_image(camera_id, image) end)
+    Task.async(fn -> store(camera_id, image) end)
 
     conn
     |> put_status(200)
@@ -31,20 +31,20 @@ defmodule EvercamMedia.SnapshotController do
     try do
       [url, auth, credentials, time, _] = decode_request_token(token)
       check_token_expiry(time)
-      response = fetch_snapshot(url, auth)
+      response = Snapshot.fetch(url, auth)
       check_jpg(response)
 
       [200, response]
     rescue
       error in [FunctionClauseError] ->
         error_handler(error)
-        [401, fallback_jpg]
+        [401, fallback]
       error in [HTTPotion.HTTPError] ->
         error_handler(error)
-        [504, fallback_jpg]
+        [504, fallback]
       _error ->
         error_handler(_error)
-        [500, fallback_jpg]
+        [500, fallback]
     end
   end
 
