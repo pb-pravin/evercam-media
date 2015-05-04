@@ -1,5 +1,5 @@
-defmodule Media.Worker do
-  import Media.SnapshotFetch
+defmodule EvercamMedia.Worker do
+  import EvercamMedia.Snapshot
 
   def start_link(args) do
     IO.puts("Starting camera worker '#{args[:camera_id]}'")
@@ -23,9 +23,9 @@ defmodule Media.Worker do
 
   defp check_camera(args) do
     try do
-      response = fetch_snapshot(args[:url], args[:auth])
+      response = fetch(args[:url], args[:auth])
       check_jpg(response)
-      store_image(args[:camera_id], response)
+      store(args[:camera_id], response)
     rescue
       error in [FunctionClauseError] ->
         error_handler(error)

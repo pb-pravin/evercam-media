@@ -1,4 +1,4 @@
-defmodule Media.Worker.Supervisor do
+defmodule EvercamMedia.Worker.Supervisor do
   use Supervisor
 
   def start_link do
@@ -7,7 +7,7 @@ defmodule Media.Worker.Supervisor do
 
   def init(_) do
     supervise(
-      [worker(Media.Worker, [],[restart: :permanent, shutdown: :infinity])],
+      [worker(EvercamMedia.Worker, [],[restart: :permanent, shutdown: :infinity])],
       strategy: :simple_one_for_one,
       max_restarts: 1_000_000,
       max_seconds: 1_000_000

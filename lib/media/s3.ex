@@ -1,4 +1,4 @@
-defmodule Media.S3 do
+defmodule EvercamMedia.S3 do
   require Logger
 
   def upload(camera_id, image, file_path, timestamp) do

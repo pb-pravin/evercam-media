@@ -1,5 +1,5 @@
 defmodule EvercamMedia.Snapshot do
-  alias Media.S3
+  alias EvercamMedia.S3
   require Logger
 
   def fetch(url, ":") do
@@ -41,7 +41,7 @@ defmodule EvercamMedia.Snapshot do
         :timer.sleep 1_000
         error_handler(_error)
         Logger.warn "Retrying S3 upload for camera '#{camera_id}', try ##{count}"
-        store_image(camera_id, image, count+1)
+        store(camera_id, image, count+1)
     end
   end
 
