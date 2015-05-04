@@ -26,7 +26,7 @@ defmodule Media.SnapshotFetch do
   def store_image(camera_id, image, count \\ 1) do
     try do
       timestamp = Timex.Date.convert Timex.Date.now, :secs
-      file_path = "#{camera_id}/snapshots/#{timestamp}.jpg"
+      file_path = "/#{camera_id}/snapshots/#{timestamp}.jpg"
       S3.upload(camera_id, image, file_path, timestamp)
 
       Exq.Enqueuer.enqueue(

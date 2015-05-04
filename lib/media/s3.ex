@@ -5,9 +5,16 @@ defmodule Media.S3 do
     tmp_path = "tmp/#{camera_id}-#{timestamp}.jpg"
 
     File.write! tmp_path, image
-    output = Porcelain.shell(
-      "aws s3 cp #{tmp_path} s3://#{System.get_env["AWS_BUCKET"]}/#{file_path}"
-    )
+
+    output = Porcelain.shell("
+      s3_put.sh \
+      #{System.get_env("AWS_ACCESS_KEY")} \
+      #{System.get_env("AWS_SECRET_KEY")} \
+      #{System.get_env("AWS_BUCKET")} \
+      #{tmp_path} \
+      #{file_path}
+    ")
+
     if output.err do raise HTTPotion.HTTPError, message: inspect(output.err) end
     File.rm tmp_path
   end

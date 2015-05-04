@@ -18,4 +18,5 @@ erl_crash.dump
 # Evercam specific files
 .env
 rel
-
+tmp/*
+tmp/.gitkeep
