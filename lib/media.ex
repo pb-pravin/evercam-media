@@ -7,9 +7,8 @@ defmodule EvercamMedia do
     import Supervisor.Spec, warn: false
 
     children = [
-      supervisor(EvercamMedia.Endpoint, []),
-      supervisor(Exq.Manager.Supervisor, []),
       supervisor(EvercamMedia.Worker.Supervisor, []),
+      supervisor(EvercamMedia.Endpoint, []),
     ]
 
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html

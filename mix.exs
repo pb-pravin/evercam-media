@@ -20,7 +20,7 @@ defmodule EvercamMedia.Mixfile do
 
   defp app_list(:dev), do: [:dotenv | app_list]
   defp app_list(_), do: app_list
-  defp app_list, do: [:phoenix, :cowboy, :logger, :httpotion, :timex, :porcelain, :erlcloud]
+  defp app_list, do: [:phoenix, :cowboy, :logger, :httpotion, :timex, :porcelain, :exq, :eredis, :uuid]
 
   # Specifies your project dependencies
   #

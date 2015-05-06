@@ -12,7 +12,7 @@
   "goldrush": {:git, "git://github.com/DeadZen/goldrush.git", "71e63212f12c25827e0c1b4198d37d5d018a7fec", [tag: "0.1.6"]},
   "hackney": {:git, "git://github.com/benoitc/hackney.git", "4584f8798277ec7568e6b84e1d68ed9a8b44696d", [tag: "1.0.6"]},
   "hackney_pooler": {:git, "git://github.com/benoitc/hackney_pooler", "28295dc1b504e495dded38c656df00dca6a51de5", [tag: "0.7.2"]},
-  "httpotion": {:git, "git://github.com/myfreeweb/httpotion.git", "25ead2bc77a6a80b5911d4e2c316b1b914391976", []},
+  "httpotion": {:git, "git://github.com/myfreeweb/httpotion.git", "8d176df14a72087f8ad51f09412e538ae3d5187b", []},
   "ibrowse": {:git, "git://github.com/cmullaparthi/ibrowse.git", "d2e369ff42666c3574b8b7ec26f69027895c4d94", [tag: "v4.1.1"]},
   "idna": {:git, "https://github.com/benoitc/erlang-idna", "c80afc2c3120010fd22287a3b2ef2bbbde57ff40", [tag: "1.0.2"]},
   "jsx": {:git, "git://github.com/talentdeficit/jsx.git", "327f0d2875676e17ed1cdff803df62ac85fd648c", [ref: "master"]},

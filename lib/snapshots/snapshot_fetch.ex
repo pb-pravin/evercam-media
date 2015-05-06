@@ -23,18 +23,38 @@ defmodule EvercamMedia.Snapshot do
     File.read! path
   end
 
+  def check_camera(args, retry \\ true) do
+    try do
+      response = fetch(args[:url], args[:auth])
+      check_jpg(response)
+      store(args[:camera_id], response)
+      response
+    rescue
+      error in [FunctionClauseError] ->
+        error_handler(error)
+      error in [HTTPotion.HTTPError] ->
+        case error.message do
+          "req_timedout" ->
+            if retry do
+              check_camera(args, false)
+            end
+          _message ->
+            timestamp = Timex.Date.convert(Timex.Date.now, :secs)
+            enqueue_status_update(args[:camera_id], false, timestamp)
+        end
+      _error ->
+        error_handler(_error)
+    end
+  end
+
   def store(camera_id, image, count \\ 1) do
     try do
       timestamp = Timex.Date.convert Timex.Date.now, :secs
       file_path = "/#{camera_id}/snapshots/#{timestamp}.jpg"
-      S3.upload(camera_id, image, file_path, timestamp)
 
-      Exq.Enqueuer.enqueue(
-        :exq_enqueuer,
-        "from_elixir",
-        "Evercam::RubyWorker",
-        [camera_id, timestamp]
-      )
+      S3.upload(camera_id, image, file_path, timestamp)
+      enqueue_snapshot_update(camera_id, timestamp)
+      enqueue_status_update(camera_id, true, timestamp)
       Logger.info "Uploaded snapshot '#{timestamp}' for camera '#{camera_id}'"
     rescue
       _error ->
@@ -47,12 +67,30 @@ defmodule EvercamMedia.Snapshot do
 
   def check_jpg(response) do
     if String.valid?(response) do
-      raise HTTPotion.HTTPError, message: "Response isn't an image"
+      raise "Response isn't an image"
     end
   end
 
   def error_handler(error) do
     Logger.error inspect(error)
     Logger.error Exception.format_stacktrace System.stacktrace
+  end
+
+  defp enqueue_snapshot_update(camera_id, timestamp) do
+    Exq.Enqueuer.enqueue(
+      :exq_enqueuer,
+      "from_elixir",
+      "Evercam::RubySnapshotWorker",
+      [camera_id, timestamp]
+    )
+  end
+
+  defp enqueue_status_update(camera_id, status, timestamp) do
+    Exq.Enqueuer.enqueue(
+      :exq_enqueuer,
+      "status",
+      "Evercam::RubyStatusWorker",
+      [camera_id, status, timestamp]
+    )
   end
 end

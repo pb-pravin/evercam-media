@@ -20,19 +20,4 @@ defmodule EvercamMedia.Worker do
     end
     loop(args)
   end
-
-  defp check_camera(args) do
-    try do
-      response = fetch(args[:url], args[:auth])
-      check_jpg(response)
-      store(args[:camera_id], response)
-    rescue
-      error in [FunctionClauseError] ->
-        error_handler(error)
-      _error in [HTTPotion.HTTPError] ->
-        IO.puts ""
-      _error ->
-        error_handler(_error)
-    end
-  end
 end

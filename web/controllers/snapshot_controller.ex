@@ -6,13 +6,11 @@ defmodule EvercamMedia.SnapshotController do
   plug :action
 
   def show(conn, params) do
-    [code, image] = snapshot(params["token"])
+    [code, image] = snapshot(params["id"], params["token"])
     response(conn, code, image, params["id"])
   end
 
   defp response(conn, 200, image, camera_id) do
-    Task.async(fn -> store(camera_id, image) end)
-
     conn
     |> put_status(200)
     |> put_resp_header("Content-Type", "image/jpg")
@@ -27,12 +25,20 @@ defmodule EvercamMedia.SnapshotController do
     |> text "We failed to retrieve a snapshot from the camera"
   end
 
-  defp snapshot(token) do
+  defp snapshot(camera_id, token) do
     try do
       [url, auth, credentials, time, _] = decode_request_token(token)
-      check_token_expiry(time)
-      response = Snapshot.fetch(url, auth)
-      check_jpg(response)
+      # check_token_expiry(time)
+
+      response = check_camera(
+        [camera_id: camera_id,
+         url: url,
+         auth: auth,
+         frequent: false]
+      )
+      if response == :ok do
+        raise "Failed to retrieve image"
+      end
 
       [200, response]
     rescue
