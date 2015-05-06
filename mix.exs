@@ -20,7 +20,7 @@ defmodule EvercamMedia.Mixfile do
 
   defp app_list(:dev), do: [:dotenv | app_list]
   defp app_list(_), do: app_list
-  defp app_list, do: [:phoenix, :cowboy, :logger, :httpotion, :timex, :porcelain, :erlcloud]
+  defp app_list, do: [:phoenix, :cowboy, :logger, :httpotion, :timex, :porcelain, :exq, :eredis, :uuid]
 
   # Specifies your project dependencies
   #
@@ -36,6 +36,9 @@ defmodule EvercamMedia.Mixfile do
      {:timex, "~> 0.13.3"},
      {:porcelain, "~> 2.0"},
      {:erlcloud, github: 'gleber/erlcloud'},
+     {:exq, github: "akira/exq"},
+     {:eredis, github: 'wooga/eredis', tag: 'v1.0.5'},
+     {:uuid, github: 'zyro/elixir-uuid', override: true},
      {:exrm, "~> 0.14.16"}]
   end
 

@@ -7,12 +7,8 @@ defmodule EvercamMedia do
     import Supervisor.Spec, warn: false
 
     children = [
-      # Start the endpoint when the application starts
+      supervisor(EvercamMedia.Worker.Supervisor, []),
       supervisor(EvercamMedia.Endpoint, []),
-      # Start the Ecto repository
-      # worker(EvercamMedia.Repo, []),
-      # Here you could define other workers and supervisors as children
-      # worker(EvercamMedia.Worker, [arg1, arg2, arg3]),
     ]
 
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html

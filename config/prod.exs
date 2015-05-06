@@ -39,6 +39,12 @@ config :logger, level: :info
 #
 #     config :evercam_media, EvercamMedia.Endpoint, server: true
 #
+config :exq,
+  host: System.get_env("REDIS_HOST") |> String.to_char_list,
+  port: System.get_env("REDIS_PORT") |> String.to_integer,
+  password: System.get_env("REDIS_PASS") |> String.to_char_list,
+  namespace: "sidekiq",
+  queues: ["to_elixir"]
 
 # Finally import the config/prod.secret.exs
 # which should be versioned separately.

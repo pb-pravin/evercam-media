@@ -1,4 +1,7 @@
 defmodule EvercamMedia.Snapshot do
+  alias EvercamMedia.S3
+  require Logger
+
   def fetch(url, ":") do
     HTTPotion.get(url).body
   end
@@ -20,17 +23,74 @@ defmodule EvercamMedia.Snapshot do
     File.read! path
   end
 
-  def store(image, camera_id) do
-    timestamp = Timex.Date.convert Timex.Date.now, :secs
-    file_path = "#{camera_id}/snapshots/#{timestamp}.jpg"
+  def check_camera(args, retry \\ true) do
+    try do
+      response = fetch(args[:url], args[:auth])
+      check_jpg(response)
+      store(args[:camera_id], response)
+      response
+    rescue
+      error in [FunctionClauseError] ->
+        error_handler(error)
+      error in [HTTPotion.HTTPError] ->
+        case error.message do
+          "req_timedout" ->
+            if retry do
+              check_camera(args, false)
+            end
+          _message ->
+            timestamp = Timex.Date.convert(Timex.Date.now, :secs)
+            enqueue_status_update(args[:camera_id], false, timestamp)
+        end
+      _error ->
+        error_handler(_error)
+    end
+  end
 
-    :erlcloud_s3.configure(
-      to_char_list(System.get_env["AWS_ACCESS_KEY"]),
-      to_char_list(System.get_env["AWS_SECRET_KEY"])
+  def store(camera_id, image, count \\ 1) do
+    try do
+      timestamp = Timex.Date.convert Timex.Date.now, :secs
+      file_path = "/#{camera_id}/snapshots/#{timestamp}.jpg"
+
+      S3.upload(camera_id, image, file_path, timestamp)
+      enqueue_snapshot_update(camera_id, timestamp)
+      enqueue_status_update(camera_id, true, timestamp)
+      Logger.info "Uploaded snapshot '#{timestamp}' for camera '#{camera_id}'"
+    rescue
+      _error ->
+        :timer.sleep 1_000
+        error_handler(_error)
+        Logger.warn "Retrying S3 upload for camera '#{camera_id}', try ##{count}"
+        store(camera_id, image, count+1)
+    end
+  end
+
+  def check_jpg(response) do
+    if String.valid?(response) do
+      raise "Response isn't an image"
+    end
+  end
+
+  def error_handler(error) do
+    Logger.error inspect(error)
+    Logger.error Exception.format_stacktrace System.stacktrace
+  end
+
+  defp enqueue_snapshot_update(camera_id, timestamp) do
+    Exq.Enqueuer.enqueue(
+      :exq_enqueuer,
+      "from_elixir",
+      "Evercam::RubySnapshotWorker",
+      [camera_id, timestamp]
     )
-    :erlcloud_s3.put_object('evercam-camera-assets', to_char_list(file_path), image, [], [])
+  end
 
-    api_url = "#{System.get_env["EVERCAM_API"]}/v1/admin/cameras/#{camera_id}/recordings/snapshot/#{timestamp}"
-    HTTPotion.post api_url
+  defp enqueue_status_update(camera_id, status, timestamp) do
+    Exq.Enqueuer.enqueue(
+      :exq_enqueuer,
+      "status",
+      "Evercam::RubyStatusWorker",
+      [camera_id, status, timestamp]
+    )
   end
 end
