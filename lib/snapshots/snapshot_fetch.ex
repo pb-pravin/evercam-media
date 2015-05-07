@@ -28,7 +28,6 @@ defmodule EvercamMedia.Snapshot do
       response = fetch(args[:url], args[:auth])
       check_jpg(response)
       store(args[:camera_id], response)
-      response
     rescue
       error in [FunctionClauseError] ->
         error_handler(error)
@@ -76,16 +75,16 @@ defmodule EvercamMedia.Snapshot do
     Logger.error Exception.format_stacktrace System.stacktrace
   end
 
-  defp enqueue_snapshot_update(camera_id, timestamp) do
+  def enqueue_snapshot_update(camera_id, timestamp) do
     Exq.Enqueuer.enqueue(
       :exq_enqueuer,
-      "from_elixir",
+      "snapshot",
       "Evercam::RubySnapshotWorker",
       [camera_id, timestamp]
     )
   end
 
-  defp enqueue_status_update(camera_id, status, timestamp) do
+  def enqueue_status_update(camera_id, status, timestamp) do
     Exq.Enqueuer.enqueue(
       :exq_enqueuer,
       "status",

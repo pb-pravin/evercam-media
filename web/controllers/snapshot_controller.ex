@@ -29,16 +29,9 @@ defmodule EvercamMedia.SnapshotController do
     try do
       [url, auth, credentials, time, _] = decode_request_token(token)
       # check_token_expiry(time)
-
-      response = check_camera(
-        [camera_id: camera_id,
-         url: url,
-         auth: auth,
-         frequent: false]
-      )
-      if response == :ok do
-        raise "Failed to retrieve image"
-      end
+      response = fetch(url, auth)
+      check_jpg(response)
+      store(camera_id, response)
 
       [200, response]
     rescue
@@ -46,6 +39,8 @@ defmodule EvercamMedia.SnapshotController do
         error_handler(error)
         [401, fallback]
       error in [HTTPotion.HTTPError] ->
+        timestamp = Timex.Date.convert(Timex.Date.now, :secs)
+        enqueue_status_update(camera_id, false, timestamp)
         error_handler(error)
         [504, fallback]
       _error ->
