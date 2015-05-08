@@ -10,7 +10,7 @@ defmodule EvercamMedia.SnapshotController do
     response(conn, code, image, params["id"])
   end
 
-  defp response(conn, 200, image, camera_id) do
+  defp response(conn, 200, image, _camera_id) do
     conn
     |> put_status(200)
     |> put_resp_header("Content-Type", "image/jpg")
@@ -40,7 +40,7 @@ defmodule EvercamMedia.SnapshotController do
         [401, fallback]
       error in [HTTPotion.HTTPError] ->
         timestamp = Timex.Date.convert(Timex.Date.now, :secs)
-        enqueue_status_update(camera_id, false, timestamp)
+        update_camera_status(camera_id, timestamp, false)
         error_handler(error)
         [504, fallback]
       _error ->

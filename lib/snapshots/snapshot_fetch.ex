@@ -1,4 +1,5 @@
 defmodule EvercamMedia.Snapshot do
+  alias EvercamMedia.Repo
   alias EvercamMedia.S3
   require Logger
 
@@ -39,7 +40,7 @@ defmodule EvercamMedia.Snapshot do
             end
           _message ->
             timestamp = Timex.Date.convert(Timex.Date.now, :secs)
-            enqueue_status_update(args[:camera_id], false, timestamp)
+            update_camera_status(args[:camera_id], timestamp, false)
         end
       _error ->
         error_handler(_error)
@@ -48,13 +49,14 @@ defmodule EvercamMedia.Snapshot do
 
   def store(camera_id, image, count \\ 1) do
     try do
-      timestamp = Timex.Date.convert Timex.Date.now, :secs
-      file_path = "/#{camera_id}/snapshots/#{timestamp}.jpg"
+      snap_timestamp = Ecto.DateTime.utc
+      file_timestamp = Timex.Date.convert Timex.Date.now, :secs
+      file_path = "/#{camera_id}/snapshots/#{file_timestamp}.jpg"
 
-      S3.upload(camera_id, image, file_path, timestamp)
-      enqueue_snapshot_update(camera_id, timestamp)
-      enqueue_status_update(camera_id, true, timestamp)
-      Logger.info "Uploaded snapshot '#{timestamp}' for camera '#{camera_id}'"
+      S3.upload(camera_id, image, file_path, file_timestamp)
+      save_snapshot_record(camera_id, snap_timestamp, S3.exists?(file_path))
+      update_camera_status(camera_id, snap_timestamp, true)
+      Logger.info "Uploaded snapshot '#{file_timestamp}' for camera '#{camera_id}'"
     rescue
       _error ->
         :timer.sleep 1_000
@@ -75,21 +77,42 @@ defmodule EvercamMedia.Snapshot do
     Logger.error Exception.format_stacktrace System.stacktrace
   end
 
-  def enqueue_snapshot_update(camera_id, timestamp) do
-    Exq.Enqueuer.enqueue(
-      :exq_enqueuer,
-      "snapshot",
-      "Evercam::RubySnapshotWorker",
-      [camera_id, timestamp]
-    )
+  def save_snapshot_record(camera_id, timestamp, true) do
+    camera = Repo.one! Camera.by_exid(camera_id)
+    Repo.insert %Snapshot{camera_id: camera.id, data: "S3", notes: "Evercam Proxy", created_at: timestamp}
   end
 
-  def enqueue_status_update(camera_id, status, timestamp) do
-    Exq.Enqueuer.enqueue(
-      :exq_enqueuer,
-      "status",
-      "Evercam::RubyStatusWorker",
-      [camera_id, status, timestamp]
-    )
+  def save_snapshot_record(camera_id, timestamp, false) do
+    raise "Snapshot '#{timestamp}' for camera '#{camera_id}' doesn't exist on S3!"
+  end
+
+  def update_camera_status(camera_id, timestamp, status) do
+    camera = Repo.one! Camera.by_exid(camera_id)
+    camera_is_online = camera.is_online
+    camera = construct_camera(camera, timestamp, status, camera_is_online == status)
+    Repo.update camera
+
+    Repo.insert %CameraActivity{camera_id: camera.id, action: "S3", done_at: timestamp}
+
+    unless camera_is_online == status do
+      Exq.Enqueuer.enqueue(
+        :exq_enqueuer,
+        "cache",
+        "Evercam::CacheInvalidationWorker",
+        camera_id
+      )
+    end
+  end
+
+  defp construct_camera(camera, timestamp, _, true) do
+    %{camera | last_polled_at: timestamp}
+  end
+
+  defp construct_camera(camera, timestamp, false, false) do
+    %{camera | last_polled_at: timestamp, is_online: false}
+  end
+
+  defp construct_camera(camera, timestamp, true, false) do
+    %{camera | last_polled_at: timestamp, is_online: true, last_online_at: timestamp}
   end
 end
