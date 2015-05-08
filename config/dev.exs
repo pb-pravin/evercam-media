@@ -32,4 +32,4 @@ config :evercam_media, EvercamMedia.Repo,
   adapter: Ecto.Adapters.Postgres,
   username: "postgres",
   password: "postgres",
-  database: "media_dev"
+  database: "evercam_dev"

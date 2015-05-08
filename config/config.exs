@@ -11,8 +11,15 @@ config :evercam_media, EvercamMedia.Endpoint,
   secret_key_base: "joIg696gDBw3ZjdFTkuWNz7s21nXrcRUkZn3Lsdp7pCNodzCMl/KymikuJVw0igG",
   debug_errors: false,
   server: true,
+  root: Path.expand("..", __DIR__),
   pubsub: [name: EvercamMedia.PubSub,
-           adapter: Phoenix.PubSub.PG2]
+           adapter: Phoenix.PubSub.PG2],
+  code_reloader: true,
+  live_reload: [
+    url: "ws://localhost:4000",
+    patterns: [~r{priv/static/.*(js|css|png|jpeg|jpg|gif)$},
+               ~r{web/views/.*(ex)$},
+               ~r{web/templates/.*(eex)$}]]
 
 # Configures Elixir's Logger
 config :logger, :console,

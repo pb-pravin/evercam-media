@@ -20,21 +20,35 @@ defmodule EvercamMedia.Mixfile do
 
   defp app_list(:dev), do: [:dotenv | app_list]
   defp app_list(_), do: app_list
-  defp app_list, do: [:phoenix, :cowboy, :logger, :httpotion, :timex, :porcelain, :exq, :eredis, :uuid]
+  defp app_list, do: [
+    :cowboy,
+    :ecto,
+    :eredis,
+    :exq,
+    :httpotion,
+    :logger,
+    :phoenix,
+    :porcelain,
+    :postgrex,
+    :timex,
+    :uuid
+  ]
 
   # Specifies your project dependencies
   #
   # Type `mix help deps` for examples and options
   defp deps do
-    [{:phoenix, "~> 0.10.0"},
-     {:phoenix_ecto, "~> 0.1"},
+    [{:phoenix, "~> 0.11.0"},
+     {:phoenix_ecto, "~> 0.3"},
      {:postgrex, ">= 0.0.0"},
+     {:ecto, "~> 0.11.2"},
      {:cowboy, "~> 1.0"},
      {:httpotion, github: "myfreeweb/httpotion"},
-     {:ibrowse, github: "cmullaparthi/ibrowse", tag: "v4.1.1"},
+     {:ibrowse, github: "cmullaparthi/ibrowse", tag: "v4.1.1", override: true},
      {:dotenv, "~> 0.0.4"},
      {:timex, "~> 0.13.3"},
      {:porcelain, "~> 2.0"},
+     {:mini_s3, github: "ericmj/mini_s3", branch: "hex-fixes"},
      {:erlcloud, github: 'gleber/erlcloud'},
      {:exq, github: "akira/exq"},
      {:eredis, github: 'wooga/eredis', tag: 'v1.0.5'},
