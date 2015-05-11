@@ -3,6 +3,7 @@ defmodule Camera do
 
   schema "cameras" do
     belongs_to :owner, User, foreign_key: :owner_id
+    has_many :camera_shares, CameraShare
     has_many :snapshots, Snapshot
 
     field :exid, :string
