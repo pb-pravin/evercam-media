@@ -18,4 +18,66 @@ defmodule Camera do
     where: cam.exid == ^camera_id,
     select: cam
   end
+
+  def limit(count) do
+    from cam in Camera,
+    limit: ^count
+  end
+
+  def external_url(camera, type \\ "http") do
+    host = camera.config["external_host"] |> to_string
+    port = camera.config["external_#{type}_port"] |> to_string
+    camera_url(host, port, type)
+  end
+
+  defp camera_url("", port, type) do
+    nil
+  end
+
+  defp camera_url(host, "", type) do
+    "#{type}://#{host}"
+  end
+
+  defp camera_url(host, port, type) do
+    "#{type}://#{host}:#{port}"
+  end
+
+  def auth(camera) do
+    "#{camera.config["auth"]["basic"]["username"]}:#{camera.config["auth"]["basic"]["password"]}"
+  end
+
+  def res_url(camera, type \\ "jpg") do
+    url = "#{camera.config["snapshots"]["jpg"]}"
+    if String.starts_with?(url, "/") || String.length(url) == 0 do
+      "#{url}"
+    else
+      "/#{url}"
+    end
+  end
+
+  def recording?(camera) do
+    recording_cameras = [
+      "beefcam1",
+      "beefcam2",
+      "beefcammobile",
+      "bennett",
+      "carrollszoocam",
+      "centralbankbuild",
+      "dancecam",
+      "dcctestdumpinghk",
+      "gemcon-cathalbrugha",
+      "gpocam",
+      "smartcity1",
+      "stephens-green",
+      "treacyconsulting1",
+      "treacyconsulting2",
+      "treacyconsulting3",
+      "wayra-agora",
+      "wayra_office",
+      "wayrahikvision",
+      "zipyard-navan-foh",
+      "zipyard-ranelagh-foh"
+    ]
+    Enum.any?(recording_cameras, &(camera.exid == &1))
+  end
 end
