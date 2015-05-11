@@ -2,6 +2,7 @@ defmodule Camera do
   use Ecto.Model
 
   schema "cameras" do
+    belongs_to :owner, User, foreign_key: :owner_id
     has_many :snapshots, Snapshot
 
     field :exid, :string
@@ -17,6 +18,13 @@ defmodule Camera do
     from cam in Camera,
     where: cam.exid == ^camera_id,
     select: cam
+  end
+
+  def by_exid_with_owner(camera_id) do
+    from cam in Camera,
+    where: cam.exid == ^camera_id,
+    select: cam,
+    preload: :owner
   end
 
   def limit(count) do
