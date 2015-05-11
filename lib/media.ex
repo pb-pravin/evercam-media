@@ -6,12 +6,6 @@ defmodule EvercamMedia do
   def start(_type, _args) do
     import Supervisor.Spec, warn: false
 
-    :mcd.start_link(
-      :memcached,
-      [Application.get_env(:memcache, :host),
-       Application.get_env(:memcache, :port)]
-    )
-
     children = [
       supervisor(EvercamMedia.Endpoint, []),
       supervisor(EvercamMedia.Repo, []),

@@ -25,10 +25,6 @@ config :logger, :console,
   format: "$time $metadata[$level] $message\n",
   metadata: [:request_id]
 
-config :memcache,
-  host: 'localhost',
-  port: 11211
-
 config :exq,
   host: '127.0.0.1',
   port: 6379,
