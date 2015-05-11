@@ -30,6 +30,7 @@ config :logger, :console, format: "[$level] $message\n"
 # Configure your database
 config :evercam_media, EvercamMedia.Repo,
   adapter: Ecto.Adapters.Postgres,
+  extensions: [{EvercamMedia.Types.JSON.Extension, library: Poison}],
   username: "postgres",
   password: "postgres",
   database: "evercam_dev"

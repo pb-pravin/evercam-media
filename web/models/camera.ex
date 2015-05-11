@@ -6,6 +6,7 @@ defmodule Camera do
 
     field :exid, :string
     field :is_online, :boolean
+    field :config, EvercamMedia.Types.JSON
     field :last_polled_at, Ecto.DateTime, default: Ecto.DateTime.utc
     field :last_online_at, Ecto.DateTime, default: Ecto.DateTime.utc
     field :updated_at, Ecto.DateTime, default: Ecto.DateTime.utc
