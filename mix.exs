@@ -10,9 +10,6 @@ defmodule EvercamMedia.Mixfile do
      deps: deps]
   end
 
-  # Configuration for the OTP application
-  #
-  # Type `mix help compile.app` for more information
   def application do
     [mod: {EvercamMedia, []},
      applications: app_list(Mix.env)]
@@ -34,15 +31,13 @@ defmodule EvercamMedia.Mixfile do
     :uuid
   ]
 
-  # Specifies your project dependencies
-  #
-  # Type `mix help deps` for examples and options
   defp deps do
     [{:phoenix, "~> 0.11.0"},
      {:phoenix_ecto, "~> 0.3"},
      {:postgrex, ">= 0.0.0"},
      {:ecto, "~> 0.11.2"},
      {:cowboy, "~> 1.0"},
+     {:mcd, github: "EchoTeam/mcd"},
      {:httpotion, github: "myfreeweb/httpotion"},
      {:ibrowse, github: "cmullaparthi/ibrowse", tag: "v4.1.1", override: true},
      {:dotenv, "~> 0.0.4"},

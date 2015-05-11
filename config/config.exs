@@ -21,10 +21,13 @@ config :evercam_media, EvercamMedia.Endpoint,
                ~r{web/views/.*(ex)$},
                ~r{web/templates/.*(eex)$}]]
 
-# Configures Elixir's Logger
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",
   metadata: [:request_id]
+
+config :memcache,
+  host: 'localhost',
+  port: 11211
 
 config :exq,
   host: '127.0.0.1',
