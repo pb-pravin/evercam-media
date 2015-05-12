@@ -5,10 +5,3 @@ use Mix.Config
 # your version control system.
 config :evercam_media, EvercamMedia.Endpoint,
   secret_key_base: "QN/Gh+weisA+h3eIRQos7XM4iuMvLfENUmAuLrEG6ddkovNA01zHzMmQgy7DTAHk"
-
-# Configure your database
-config :evercam_media, EvercamMedia.Repo,
-  adapter: Ecto.Adapters.Postgres,
-  username: "postgres",
-  password: "postgres",
-  database: "media_prod"

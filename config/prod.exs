@@ -46,6 +46,13 @@ config :exq,
   namespace: "sidekiq",
   queues: ["to_elixir"]
 
+config :evercam_media, EvercamMedia.Repo,
+  adapter: Ecto.Adapters.Postgres,
+  extensions: [{EvercamMedia.Types.JSON.Extension, library: Poison}],
+  url: System.get_env("DATABASE_URL"),
+  size: 50,
+  ssl: true
+
 # Finally import the config/prod.secret.exs
 # which should be versioned separately.
 import_config "prod.secret.exs"

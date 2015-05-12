@@ -13,13 +13,7 @@ config :evercam_media, EvercamMedia.Endpoint,
   server: true,
   root: Path.expand("..", __DIR__),
   pubsub: [name: EvercamMedia.PubSub,
-           adapter: Phoenix.PubSub.PG2],
-  code_reloader: true,
-  live_reload: [
-    url: "ws://localhost:4000",
-    patterns: [~r{priv/static/.*(js|css|png|jpeg|jpg|gif)$},
-               ~r{web/views/.*(ex)$},
-               ~r{web/templates/.*(eex)$}]]
+           adapter: Phoenix.PubSub.PG2]
 
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",
