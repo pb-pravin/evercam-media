@@ -32,6 +32,8 @@ defmodule EvercamMedia.Snapshot do
     rescue
       error in [FunctionClauseError] ->
         error_handler(error)
+      error in [SnapshotError] ->
+        Logger.info "#{error.message} for camera '#{args[:camera_id]}'"
       error in [HTTPotion.HTTPError] ->
         case error.message do
           "req_timedout" ->
@@ -70,7 +72,7 @@ defmodule EvercamMedia.Snapshot do
 
   def check_jpg(response) do
     if String.valid?(response) do
-      raise "Response isn't an image"
+      raise SnapshotError
     end
   end
 
@@ -79,14 +81,15 @@ defmodule EvercamMedia.Snapshot do
     Logger.error Exception.format_stacktrace System.stacktrace
   end
 
-  def save_snapshot_record(camera_id, snap_timestamp, file_timestamp, true, _) do
+  def save_snapshot_record(camera_id, snap_timestamp, file_timestamp, true, _, _) do
     camera = Repo.one! Camera.by_exid(camera_id)
     Repo.insert %Snapshot{camera_id: camera.id, data: "S3", notes: "Evercam Proxy", created_at: snap_timestamp}
   end
 
-  def save_snapshot_record(camera_id, snap_timestamp, file_timestamp, false, file_path) do
+  def save_snapshot_record(camera_id, snap_timestamp, file_timestamp, false, file_path, count \\ 0) do
+    Logger.error "Snapshot for '#{camera_id} not found on S3, try ##{count}"
     :timer.sleep 1000
-    save_snapshot_record(camera_id, snap_timestamp, file_timestamp, S3.exists?(file_path), file_path)
+    save_snapshot_record(camera_id, snap_timestamp, file_timestamp, S3.exists?(file_path), file_path, count + 1)
   end
 
   def update_camera_status(camera_id, timestamp, status) do
@@ -94,7 +97,6 @@ defmodule EvercamMedia.Snapshot do
     camera_is_online = camera.is_online
     camera = construct_camera(camera, timestamp, status, camera_is_online == status)
     Repo.update camera
-
 
     unless camera_is_online == status do
       log_camera_status(camera.id, status, timestamp)
@@ -127,4 +129,8 @@ defmodule EvercamMedia.Snapshot do
   defp construct_camera(camera, timestamp, true, false) do
     %{camera | last_polled_at: timestamp, is_online: true, last_online_at: timestamp}
   end
+end
+
+defmodule SnapshotError do
+  defexception message: "Response isn't an image"
 end

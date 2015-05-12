@@ -22,7 +22,8 @@ defmodule EvercamMedia.Worker.Supervisor do
 
   def initiate_workers do
     EvercamMedia.Repo.all(Camera)
-    |> Enum.map &(start_camera_worker &1)
+    # |> Enum.filter(&(Camera.recording? &1))
+    |> Enum.map(&(start_camera_worker &1))
   end
 
   def start_camera_worker(camera) do

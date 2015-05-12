@@ -33,6 +33,7 @@ defmodule EvercamMedia.S3 do
     end
 
     File.rm tmp_path
+    :timer.sleep 1000
   end
 
   def exists?(file_name) do
