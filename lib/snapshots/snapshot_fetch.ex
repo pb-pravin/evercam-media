@@ -81,13 +81,17 @@ defmodule EvercamMedia.Snapshot do
     Logger.error Exception.format_stacktrace System.stacktrace
   end
 
+  def save_snapshot_record(camera_id, _, file_timestamp, _, _, count) when count >= 10 do
+    Logger.error "Snapshot '#{file_timestamp}' for '#{camera_id}' not found on S3, aborting."
+  end
+
   def save_snapshot_record(camera_id, snap_timestamp, file_timestamp, true, _, _) do
     camera = Repo.one! Camera.by_exid(camera_id)
     Repo.insert %Snapshot{camera_id: camera.id, data: "S3", notes: "Evercam Proxy", created_at: snap_timestamp}
   end
 
-  def save_snapshot_record(camera_id, snap_timestamp, file_timestamp, false, file_path, count \\ 0) do
-    Logger.error "Snapshot for '#{camera_id} not found on S3, try ##{count}"
+  def save_snapshot_record(camera_id, snap_timestamp, file_timestamp, false, file_path, count \\ 0) when count < 10 do
+    Logger.warn "Snapshot '#{file_timestamp}' for '#{camera_id}' not found on S3, try ##{count}"
     :timer.sleep 1000
     save_snapshot_record(camera_id, snap_timestamp, file_timestamp, S3.exists?(file_path), file_path, count + 1)
   end
