@@ -13,7 +13,7 @@ defmodule EvercamMedia.SnapshotController do
   defp response(conn, 200, image, _camera_id) do
     conn
     |> put_status(200)
-    |> put_resp_header("Content-Type", "image/jpg")
+    |> put_resp_header("content-type", "image/jpg")
     |> put_resp_header("access-control-allow-origin", "*")
     |> text image
   end
