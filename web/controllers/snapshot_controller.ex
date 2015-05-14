@@ -38,10 +38,11 @@ defmodule EvercamMedia.SnapshotController do
       error in [FunctionClauseError] ->
         error_handler(error)
         [401, fallback]
-      error in [HTTPotion.HTTPError] ->
-        timestamp = Timex.Date.convert(Timex.Date.now, :secs)
+      _error in [SnapshotError] ->
+        [504, fallback]
+      _error in [HTTPotion.HTTPError] ->
+        timestamp = Ecto.DateTime.utc
         update_camera_status(camera_id, timestamp, false)
-        error_handler(error)
         [504, fallback]
       _error ->
         error_handler(_error)
