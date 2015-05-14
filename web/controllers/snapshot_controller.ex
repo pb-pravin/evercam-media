@@ -31,6 +31,7 @@ defmodule EvercamMedia.SnapshotController do
       # check_token_expiry(time)
       response = fetch(url, auth)
       check_jpg(response)
+      broadcast_snapshot(camera_id, response)
       store(camera_id, response)
 
       [200, response]

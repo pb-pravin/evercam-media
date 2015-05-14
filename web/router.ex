@@ -8,6 +8,10 @@ defmodule EvercamMedia.Router do
     plug :protect_from_forgery
   end
 
+  socket "/", EvercamMedia do
+    channel "cameras:*", SnapshotChannel
+  end
+
   scope "/", EvercamMedia do
     pipe_through :browser
 

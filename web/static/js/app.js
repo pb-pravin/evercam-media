@@ -1,10 +1,17 @@
 import {Socket} from "phoenix"
 
-// let socket = new Socket("/ws")
-// socket.join("topic:subtopic", {}, chan => {
-// })
+$(() => {
+  let camera_id = window.Evercam.Camera.id;
 
-let App = {
-}
+  let socket = new Socket("ws://localhost:4000/ws")
 
-export default App
+  socket.connect();
+
+  let chan = socket.chan(`cameras:${camera_id}`, {})
+
+  chan.join()
+
+  chan.on("snapshot-taken", payload => {
+    $("#live-player-image").attr("src", "data:image/jpeg;base64," + payload.image);
+  })
+})

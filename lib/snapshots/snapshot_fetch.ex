@@ -28,6 +28,7 @@ defmodule EvercamMedia.Snapshot do
     try do
       response = fetch(args[:url], args[:auth])
       check_jpg(response)
+      broadcast_snapshot(args[:camera_id], response)
       store(args[:camera_id], response)
     rescue
       error in [FunctionClauseError] ->
@@ -112,6 +113,14 @@ defmodule EvercamMedia.Snapshot do
         camera_id
       )
     end
+  end
+
+  def broadcast_snapshot(camera_id, image) do
+    EvercamMedia.Endpoint.broadcast(
+      "cameras:#{camera_id}",
+      "snapshot-taken",
+      %{image: Base.encode64(image)}
+    )
   end
 
   def log_camera_status(camera_id, true, timestamp) do
