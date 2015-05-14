@@ -8,15 +8,15 @@ defmodule EvercamMedia.Router do
     plug :protect_from_forgery
   end
 
-  socket "/", EvercamMedia do
-    channel "cameras:*", SnapshotChannel
-  end
-
   scope "/", EvercamMedia do
     pipe_through :browser
 
     get "/", PageController, :index
 
     get "/v1/cameras/:id/live/snapshot", SnapshotController, :show
+  end
+
+  socket "/ws", EvercamMedia do
+    channel "cameras:*", SnapshotChannel
   end
 end
