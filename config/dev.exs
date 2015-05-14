@@ -9,23 +9,19 @@ use Mix.Config
 config :evercam_media, EvercamMedia.Endpoint,
   http: [port: 4000],
   debug_errors: true,
+  code_reloader: true,
   cache_static_lookup: false,
-  watchers: [{Path.expand("node_modules/brunch/bin/brunch"), ["watch"]}]
+  watchers: [node: ["node_modules/brunch/bin/brunch", "watch"]]
 
 # Watch static and templates for browser reloading.
-# *Note*: Be careful with wildcards. Larger projects
-# will use higher CPU in dev as the number of files
-# grow. Adjust as necessary.
 config :evercam_media, EvercamMedia.Endpoint,
-  code_reloader: true,
   live_reload: [
-    url: "ws://localhost:4000",
-    patterns: [~r{priv/static/.*(js|css|png|jpeg|jpg|gif)$},
-               ~r{web/views/.*(ex)$},
-               ~r{web/templates/.*(eex)$}]]
-
-# Enables code reloading for development
-config :phoenix, :code_reloader, true
+    patterns: [
+      ~r{priv/static/.*(js|css|png|jpeg|jpg|gif)$},
+      ~r{web/views/.*(ex)$},
+      ~r{web/templates/.*(eex)$}
+    ]
+  ]
 
 # Do not include metadata nor timestamps in development logs
 config :logger, :console, format: "[$level] $message\n"

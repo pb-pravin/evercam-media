@@ -8,7 +8,8 @@ use Mix.Config
 # meaningful, we use this information when generating URLs.
 config :evercam_media, EvercamMedia.Endpoint,
   http: [port: 4000],
-  url: [host: "evercam.io"]
+  url: [host: "evercam.io"],
+  cache_static_manifest: "priv/static/manifest.json"
 
 # ## SSL Support
 #

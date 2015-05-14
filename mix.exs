@@ -6,6 +6,8 @@ defmodule EvercamMedia.Mixfile do
      version: get_version,
      elixir: "~> 1.0",
      elixirc_paths: ["lib", "web"],
+     build_embedded: Mix.env == :prod,
+     start_permanent: Mix.env == :prod,
      compilers: [:phoenix] ++ Mix.compilers,
      deps: deps]
   end
@@ -34,8 +36,10 @@ defmodule EvercamMedia.Mixfile do
   ]
 
   defp deps do
-    [{:phoenix, "~> 0.11.0"},
-     {:phoenix_ecto, "~> 0.3"},
+    [{:phoenix, "~> 0.13"},
+     {:phoenix_ecto, "~> 0.4"},
+     {:phoenix_html, "~> 1.0"},
+     {:phoenix_live_reload, "~> 0.4", only: :dev},
      {:postgrex, ">= 0.0.0"},
      {:ecto, "~> 0.11.2"},
      {:cowboy, "~> 1.0"},
@@ -47,7 +51,7 @@ defmodule EvercamMedia.Mixfile do
      {:mini_s3, github: "ericmj/mini_s3", branch: "hex-fixes"},
      {:erlcloud, github: 'gleber/erlcloud'},
      {:exq, github: "akira/exq"},
-     {:eredis, github: 'wooga/eredis', tag: 'v1.0.5'},
+     {:eredis, github: 'wooga/eredis', tag: 'v1.0.5', override: true},
      {:uuid, github: 'zyro/elixir-uuid', override: true},
      {:exrm, "~> 0.14.16"}]
   end

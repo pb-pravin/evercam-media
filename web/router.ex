@@ -1,5 +1,5 @@
 defmodule EvercamMedia.Router do
-  use Phoenix.Router
+  use EvercamMedia.Web, :router
 
   pipeline :browser do
     plug :accepts, ["html", "json", "jpg"]
@@ -8,20 +8,11 @@ defmodule EvercamMedia.Router do
     plug :protect_from_forgery
   end
 
-  pipeline :api do
-    plug :accepts, ["json"]
-  end
-
   scope "/", EvercamMedia do
-    pipe_through :browser # Use the default browser stack
+    pipe_through :browser
 
     get "/", PageController, :index
 
     get "/v1/cameras/:id/live/snapshot", SnapshotController, :show
   end
-
-  # Other scopes may use custom stacks.
-  # scope "/api", EvercamMedia do
-  #   pipe_through :api
-  # end
 end
