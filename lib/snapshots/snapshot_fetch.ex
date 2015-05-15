@@ -56,9 +56,9 @@ defmodule EvercamMedia.Snapshot do
       file_timestamp = Timex.Date.convert Timex.Date.now, :secs
       file_path = "/#{camera_id}/snapshots/#{file_timestamp}.jpg"
 
+      update_camera_status(camera_id, snap_timestamp, true)
       S3.upload(camera_id, image, file_path, file_timestamp)
       save_snapshot_record(camera_id, snap_timestamp, file_timestamp, S3.exists?(file_path), file_path)
-      update_camera_status(camera_id, snap_timestamp, true)
       Logger.info "Uploaded snapshot '#{file_timestamp}' for camera '#{camera_id}'"
     rescue
       error in [Postgrex.Error] ->
