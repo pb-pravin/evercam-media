@@ -3,6 +3,7 @@ defmodule Camera do
 
   schema "cameras" do
     belongs_to :owner, User, foreign_key: :owner_id
+    belongs_to :vendor_model, VendorModel, foreign_key: :model_id
     has_many :camera_shares, CameraShare
     has_many :snapshots, Snapshot
 
@@ -56,7 +57,7 @@ defmodule Camera do
   end
 
   def res_url(camera, type \\ "jpg") do
-    url = "#{camera.config["snapshots"]["jpg"]}"
+    url = "#{camera.config["snapshots"][type]}"
     if String.starts_with?(url, "/") || String.length(url) == 0 do
       "#{url}"
     else

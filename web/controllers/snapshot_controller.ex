@@ -51,17 +51,6 @@ defmodule EvercamMedia.SnapshotController do
     end
   end
 
-  defp decode_request_token(token) do
-    {_, encrypted_message} = Base.url_decode64(token)
-    message = :crypto.block_decrypt(
-      :aes_cbc256,
-      System.get_env["SNAP_KEY"],
-      System.get_env["SNAP_IV"],
-      encrypted_message
-    )
-    String.split(message, "|")
-  end
-
   defp check_token_expiry(time) do
     token_time = DateFormat.parse! time, "{ISOz}"
     token_time = Date.shift token_time, mins: 5

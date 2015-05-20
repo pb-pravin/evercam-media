@@ -14,6 +14,8 @@ defmodule EvercamMedia.Router do
     get "/", PageController, :index
 
     get "/v1/cameras/:id/live/snapshot", SnapshotController, :show
+
+    get "/on_play", StreamController, :show
   end
 
   socket "/ws", EvercamMedia do
