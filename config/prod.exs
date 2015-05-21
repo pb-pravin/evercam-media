@@ -40,6 +40,10 @@ config :logger, level: :info
 #
 #     config :evercam_media, EvercamMedia.Endpoint, server: true
 #
+
+config :nginx_rtmp,
+  hls_url: "http://media.evercam.io:8080"
+
 config :exq,
   host: System.get_env("REDIS_HOST") |> String.to_char_list,
   port: System.get_env("REDIS_PORT") |> String.to_integer,
