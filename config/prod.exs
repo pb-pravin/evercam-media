@@ -42,7 +42,7 @@ config :logger, level: :info
 #
 
 config :nginx_rtmp,
-  hls_url: "http://media.evercam.io:8080"
+  hls_url: "https://media.evercam.io"
 
 config :exq,
   host: System.get_env("REDIS_HOST") |> String.to_char_list,
