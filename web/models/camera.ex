@@ -82,6 +82,8 @@ defmodule Camera do
       "hw-hack-auditorium",
       "landing-zone-backdoor",
       "landing-zone-front",
+      "mac1",
+      "mac2",
       "pch-hackcam1",
       "pch-hackcam2",
       "smartcity1",
