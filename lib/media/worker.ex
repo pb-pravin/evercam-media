@@ -12,12 +12,14 @@ defmodule EvercamMedia.Worker do
   end
 
   defp loop(args) do
-    Task.async(fn -> check_camera(args) end)
     if args[:frequent] do
-      :timer.sleep 1_000
+      :timer.sleep(1_800)
     else
-      :timer.sleep 60_000
+      :timer.sleep(60_000 + args[:initial_sleep])
+      args = Dict.put(args, :initial_sleep, 0)
     end
+
+    Task.async(fn -> check_camera(args) end)
     loop(args)
   end
 end

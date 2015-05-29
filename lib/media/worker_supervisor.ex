@@ -22,7 +22,7 @@ defmodule EvercamMedia.Worker.Supervisor do
 
   def initiate_workers do
     EvercamMedia.Repo.all(Camera)
-    |> Enum.filter(&(Camera.recording? &1))
+    # |> Enum.filter(&(Camera.recording? &1))
     |> Enum.map(&(start_camera_worker &1))
   end
 
@@ -30,10 +30,11 @@ defmodule EvercamMedia.Worker.Supervisor do
     url = "#{Camera.external_url(camera)}#{Camera.res_url(camera, "jpg")}"
     auth = Camera.auth(camera)
     frequent = Camera.recording?(camera)
+    sleep = :crypto.rand_uniform(1, 60) * 1000
 
     unless String.length(url) == 0 do
       EvercamMedia.Worker.Supervisor.start_child(
-        [camera_id: camera.exid, url: url, auth: auth, frequent: frequent]
+        [camera_id: camera.exid, url: url, auth: auth, frequent: frequent, initial_sleep: sleep]
       )
     end
   end

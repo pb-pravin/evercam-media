@@ -79,6 +79,7 @@ defmodule Camera do
       "evercam-remembrance-camera",
       "gemcon-cathalbrugha",
       "gpocam",
+      "hikdemo",
       "hw-hack-auditorium",
       "landing-zone-backdoor",
       "landing-zone-front",
