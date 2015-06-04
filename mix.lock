@@ -25,7 +25,7 @@
   "mcd": {:git, "git://github.com/EchoTeam/mcd.git", "4a282234795ecb31f93f59fbaea7940276a0a179", []},
   "meck": {:git, "https://github.com/eproxus/meck.git", "98cdc40fe6ae7780491ed8d0db691dd15625e9b2", [ref: "master"]},
   "mini_s3": {:git, "git://github.com/ericmj/mini_s3.git", "700386bc8c3a804af57380c0fd09a02325142c9b", [branch: "hex-fixes"]},
-  "phoenix": {:hex, :phoenix, "0.13.0"},
+  "phoenix": {:hex, :phoenix, "0.13.1"},
   "phoenix_ecto": {:hex, :phoenix_ecto, "0.4.0"},
   "phoenix_html": {:hex, :phoenix_html, "1.0.1"},
   "phoenix_live_reload": {:hex, :phoenix_live_reload, "0.4.0"},
