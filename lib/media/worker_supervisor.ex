@@ -6,7 +6,7 @@ defmodule EvercamMedia.Worker.Supervisor do
   end
 
   def init(_) do
-    Task.async(&EvercamMedia.Worker.Supervisor.initiate_workers/0)
+    Task.start_link(&EvercamMedia.Worker.Supervisor.initiate_workers/0)
 
     supervise(
       [worker(EvercamMedia.Worker, [], [restart: :permanent, shutdown: :infinity])],
