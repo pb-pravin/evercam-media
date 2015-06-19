@@ -10,6 +10,7 @@ defmodule EvercamMedia do
       supervisor(EvercamMedia.Endpoint, []),
       supervisor(EvercamMedia.Repo, []),
       supervisor(EvercamMedia.Worker.Supervisor, []),
+      worker(ConCache, [[ttl_check: 100, ttl: 1500], [name: :cache]])
     ]
 
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html

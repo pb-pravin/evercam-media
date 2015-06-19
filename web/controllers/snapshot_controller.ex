@@ -6,48 +6,82 @@ defmodule EvercamMedia.SnapshotController do
   plug :action
 
   def show(conn, params) do
-    [code, image] = snapshot(params["id"], params["token"])
-    response(conn, code, image, params["id"])
+    [code, response] = [200, ConCache.get(:cache, params["id"])]
+    unless response do
+      [code, response] = snapshot(params["id"], params["token"])
+    end
+    show_respond(conn, code, response, params["id"])
   end
 
-  defp response(conn, 200, image, _camera_id) do
+  def create(conn, params) do
+    [code, response] = [200, ConCache.get(:cache, params["id"])]
+    unless response do
+      [code, response] = snapshot(params["id"], params["token"], params["notes"])
+    end
+    create_respond(conn, code, response, params, params["with_data"])
+  end
+
+  defp show_respond(conn, 200, response, _camera_id) do
     conn
     |> put_status(200)
     |> put_resp_header("content-type", "image/jpg")
     |> put_resp_header("access-control-allow-origin", "*")
-    |> text image
+    |> text response[:image]
   end
 
-  defp response(conn, code, _, _) do
+  defp show_respond(conn, code, response, _) do
     conn
     |> put_status(code)
     |> put_resp_header("access-control-allow-origin", "*")
-    |> text "We failed to retrieve a snapshot from the camera"
+    |> json response
   end
 
-  defp snapshot(camera_id, token) do
+  defp create_respond(conn, 200, response, params, "true") do
+    data = "data:image/jpeg;base64,#{Base.encode64(response[:image])}"
+
+    conn
+    |> put_status(200)
+    |> put_resp_header("access-control-allow-origin", "*")
+    |> json %{created_at: response[:timestamp], notes: response[:notes], data: data}
+  end
+
+  defp create_respond(conn, 200, response, params, _) do
+    conn
+    |> put_status(200)
+    |> put_resp_header("access-control-allow-origin", "*")
+    |> json %{created_at: response[:timestamp], notes: response[:notes]}
+  end
+
+  defp create_respond(conn, code, response, _, _) do
+    conn
+    |> put_status(code)
+    |> put_resp_header("access-control-allow-origin", "*")
+    |> json response
+  end
+
+  defp snapshot(camera_id, token, notes \\ "Evercam Proxy") do
     try do
       [url, auth, credentials, time, _] = decode_request_token(token)
       # check_token_expiry(time)
-      response = fetch(url, auth)
-      check_jpg(response)
-      broadcast_snapshot(camera_id, response)
-      store(camera_id, response)
+      data = fetch(url, auth)
+      check_jpg(data)
+      broadcast_snapshot(camera_id, data)
+      response = store(camera_id, data, notes)
 
       [200, response]
     rescue
       error in [FunctionClauseError] ->
         error_handler(error)
-        [401, fallback]
+        [401, %{message: "Unauthorized."}]
       _error in [SnapshotError] ->
-        [504, fallback]
+        [504, %{message: "Camera didn't respond with an image."}]
       _error in [HTTPotion.HTTPError] ->
         timestamp = Ecto.DateTime.utc
         update_camera_status(camera_id, timestamp, false)
-        [504, fallback]
+        [504, %{message: "Camera seems to be offline."}]
       _error ->
         error_handler(_error)
-        [500, fallback]
+        [500, %{message: "Sorry, we dropped the ball."}]
     end
   end
 

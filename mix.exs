@@ -20,6 +20,7 @@ defmodule EvercamMedia.Mixfile do
   defp app_list(:dev), do: [:dotenv | app_list]
   defp app_list(_), do: app_list
   defp app_list, do: [
+    :con_cache,
     :cowboy,
     :ecto,
     :eredis,
@@ -43,6 +44,7 @@ defmodule EvercamMedia.Mixfile do
      {:postgrex, ">= 0.0.0"},
      {:ecto, "~> 0.11.2"},
      {:cowboy, "~> 1.0"},
+     {:con_cache, "~> 0.6.0"},
      {:httpotion, github: "myfreeweb/httpotion"},
      {:ibrowse, github: "cmullaparthi/ibrowse", tag: "v4.1.1", override: true},
      {:dotenv, "~> 0.0.4"},

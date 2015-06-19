@@ -13,7 +13,7 @@ defmodule EvercamMedia.Worker do
 
   defp loop(args) do
     if args[:frequent] do
-      :timer.sleep(1_800)
+      :timer.sleep(1000)
     else
       :timer.sleep(60_000 + args[:initial_sleep])
       args = Dict.put(args, :initial_sleep, 0)

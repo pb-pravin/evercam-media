@@ -29,7 +29,7 @@ defmodule EvercamMedia.Snapshot do
       response = fetch(args[:url], args[:auth])
       check_jpg(response)
       broadcast_snapshot(args[:camera_id], response)
-      store(args[:camera_id], response)
+      store(args[:camera_id], response, "Evercam Proxy")
     rescue
       error in [FunctionClauseError] ->
         error_handler(error)
@@ -50,7 +50,7 @@ defmodule EvercamMedia.Snapshot do
     end
   end
 
-  def store(camera_id, image, count \\ 1) do
+  def store(camera_id, image, notes \\ "", count \\ 1) do
     try do
       snap_timestamp = Ecto.DateTime.utc
       file_timestamp = Timex.Date.convert Timex.Date.now, :secs
@@ -58,8 +58,10 @@ defmodule EvercamMedia.Snapshot do
 
       update_camera_status(camera_id, snap_timestamp, true)
       S3.upload(camera_id, image, file_path, file_timestamp)
-      save_snapshot_record(camera_id, snap_timestamp, file_timestamp, S3.exists?(file_path), file_path)
+      save_snapshot_record(camera_id, notes, snap_timestamp, file_timestamp, S3.exists?(file_path), file_path)
+      ConCache.put(:cache, camera_id, %{image: image, timestamp: file_timestamp, notes: notes})
       Logger.info "Uploaded snapshot '#{file_timestamp}' for camera '#{camera_id}'"
+      %{camera_id: camera_id, image: image, timestamp: file_timestamp, notes: notes}
     rescue
       error in [Postgrex.Error] ->
         Logger.warn "Postgrex Error: #{error.postgres[:message]}"
@@ -67,7 +69,9 @@ defmodule EvercamMedia.Snapshot do
         :timer.sleep 1_000
         error_handler(_error)
         Logger.warn "Retrying S3 upload for camera '#{camera_id}', try ##{count}"
-        store(camera_id, image, count+1)
+        if count < 10 do
+          store(camera_id, image, notes, count+1)
+        end
     end
   end
 
@@ -82,19 +86,19 @@ defmodule EvercamMedia.Snapshot do
     Logger.error Exception.format_stacktrace System.stacktrace
   end
 
-  def save_snapshot_record(camera_id, _, file_timestamp, _, _, count) when count >= 10 do
+  def save_snapshot_record(camera_id, _, _, file_timestamp, _, _, count) when count >= 10 do
     Logger.error "Snapshot '#{file_timestamp}' for '#{camera_id}' not found on S3, aborting."
   end
 
-  def save_snapshot_record(camera_id, snap_timestamp, file_timestamp, true, _, _) do
+  def save_snapshot_record(camera_id, notes, snap_timestamp, file_timestamp, true, _, _) do
     camera = Repo.one! Camera.by_exid(camera_id)
-    Repo.insert %Snapshot{camera_id: camera.id, data: "S3", notes: "Evercam Proxy", created_at: snap_timestamp}
+    Repo.insert %Snapshot{camera_id: camera.id, data: "S3", notes: notes, created_at: snap_timestamp}
   end
 
-  def save_snapshot_record(camera_id, snap_timestamp, file_timestamp, false, file_path, count \\ 0) when count < 10 do
+  def save_snapshot_record(camera_id, notes, snap_timestamp, file_timestamp, false, file_path, count \\ 0) when count < 10 do
     Logger.warn "Snapshot '#{file_timestamp}' for '#{camera_id}' not found on S3, try ##{count}"
     :timer.sleep 1000
-    save_snapshot_record(camera_id, snap_timestamp, file_timestamp, S3.exists?(file_path), file_path, count + 1)
+    save_snapshot_record(camera_id, notes, snap_timestamp, file_timestamp, S3.exists?(file_path), file_path, count + 1)
   end
 
   def update_camera_status(camera_id, timestamp, status) do
