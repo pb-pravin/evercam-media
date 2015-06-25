@@ -67,13 +67,13 @@ defmodule Camera do
 
   def recording?(camera) do
     recording_cameras = [
-      "beefcam1",
-      "beefcam2",
       "beefcammobile",
       "bennett",
       "carrollszoocam",
       "centralbankbuild",
       "dancecam",
+      "daqrihack1",
+      "daqrihack2",
       "dcctestdumpinghk",
       "devilsbitcidercam",
       "evercam-remembrance-camera",
