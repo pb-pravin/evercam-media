@@ -23,6 +23,7 @@ defmodule EvercamMedia.Mixfile do
     :con_cache,
     :cowboy,
     :ecto,
+    :erlcloud,
     :eredis,
     :exq,
     :httpotion,

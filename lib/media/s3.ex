@@ -52,6 +52,22 @@ defmodule EvercamMedia.S3 do
     end
   end
 
+  def file_url(file_name) do
+    configure_erlcloud
+    "/" <> name = file_name
+    name   = String.to_char_list(name)
+    bucket = System.get_env("AWS_BUCKET") |> String.to_char_list
+    {expires, host, uri} = :erlcloud_s3.make_link(100000000, bucket, name)
+    "#{to_string(host)}#{to_string(uri)}"
+  end
+
+  defp configure_erlcloud do
+    :erlcloud_s3.configure(
+      to_char_list(System.get_env["AWS_ACCESS_KEY"]),
+      to_char_list(System.get_env["AWS_SECRET_KEY"])
+    )
+  end
+
   defp config do
     access_key = System.get_env("AWS_ACCESS_KEY") |> String.to_char_list
     secret_key = System.get_env("AWS_SECRET_KEY") |> String.to_char_list

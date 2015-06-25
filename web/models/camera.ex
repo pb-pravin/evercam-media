@@ -8,6 +8,7 @@ defmodule Camera do
     has_many :snapshots, Snapshot
 
     field :exid, :string
+    field :thumbnail_url, :string
     field :is_online, :boolean
     field :config, EvercamMedia.Types.JSON
     field :last_polled_at, Ecto.DateTime, default: Ecto.DateTime.utc

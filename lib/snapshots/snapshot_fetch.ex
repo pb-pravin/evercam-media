@@ -90,15 +90,22 @@ defmodule EvercamMedia.Snapshot do
     Logger.error "Snapshot '#{file_timestamp}' for '#{camera_id}' not found on S3, aborting."
   end
 
-  def save_snapshot_record(camera_id, notes, snap_timestamp, file_timestamp, true, _, _) do
+  def save_snapshot_record(camera_id, notes, snap_timestamp, file_timestamp, true, file_path, _) do
     camera = Repo.one! Camera.by_exid(camera_id)
     Repo.insert %Snapshot{camera_id: camera.id, data: "S3", notes: notes, created_at: snap_timestamp}
+    update_thumbnail_url(camera_id, file_path)
   end
 
   def save_snapshot_record(camera_id, notes, snap_timestamp, file_timestamp, false, file_path, count \\ 0) when count < 10 do
     Logger.warn "Snapshot '#{file_timestamp}' for '#{camera_id}' not found on S3, try ##{count}"
     :timer.sleep 1000
     save_snapshot_record(camera_id, notes, snap_timestamp, file_timestamp, S3.exists?(file_path), file_path, count + 1)
+  end
+
+  def update_thumbnail_url(camera_id, file_path) do
+    camera = Repo.one! Camera.by_exid(camera_id)
+    camera = %{camera | thumbnail_url: S3.file_url(file_path)}
+    Repo.update camera
   end
 
   def update_camera_status(camera_id, timestamp, status) do
@@ -109,14 +116,17 @@ defmodule EvercamMedia.Snapshot do
 
     unless camera_is_online == status do
       log_camera_status(camera.id, status, timestamp)
-
-      Exq.Enqueuer.enqueue(
-        :exq_enqueuer,
-        "cache",
-        "Evercam::CacheInvalidationWorker",
-        camera_id
-      )
+      invalidate_cache(camera_id)
     end
+  end
+
+  def invalidate_cache(camera_id) do
+    Exq.Enqueuer.enqueue(
+      :exq_enqueuer,
+      "cache",
+      "Evercam::CacheInvalidationWorker",
+      camera_id
+    )
   end
 
   def broadcast_snapshot(camera_id, image) do
