@@ -17,7 +17,12 @@ Evercam Media is the component that is responsible for talking directly to the c
 * Convert rtsp stream to rtmp
 * store snapshots to S3 bucket
 
-## Help make it better
+## Come on in, the water's warm :)
+
+We've identified some tasks as good one's to just "Dip your toe" into our codebase: 
+https://github.com/evercam/evercam-media/labels/Difficulty%20-%20Toe%20Dipper
+
+And, there's a reward of a lifetime's subscription to [Elixir Sips](http://elixirsips.com/) for anyone who solves an issue :)
 
 The entire Evercam codebase is open source, see details: http://www.evercam.io/open-source
 
