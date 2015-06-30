@@ -19,8 +19,7 @@ Evercam Media is the component that is responsible for talking directly to the c
 
 ## Come on in, the water's warm :)
 
-We've identified some tasks as good one's to just "Dip your toe" into our codebase: 
-https://github.com/evercam/evercam-media/labels/Difficulty%20-%20Toe%20Dipper
+We've identified some tasks as good one's to just "Dip your toe" into our codebase: [Toe Dipper Issues](https://github.com/evercam/evercam-media/labels/Difficulty%20-%20Toe%20Dipper)
 
 And, there's a reward of a lifetime's subscription to [Elixir Sips](http://elixirsips.com/) for anyone who solves an issue :)
 
