@@ -2,6 +2,7 @@ defmodule EvercamMedia.SnapshotController do
   use Phoenix.Controller
   use Timex
   import EvercamMedia.Snapshot
+  alias EvercamMedia.HTTPClient
   require Logger
   plug :action
 
@@ -63,7 +64,7 @@ defmodule EvercamMedia.SnapshotController do
     try do
       [url, auth, credentials, time, _] = decode_request_token(token)
       # check_token_expiry(time)
-      data = fetch(url, auth)
+      data = HTTPClient.get(url, auth).body
       check_jpg(data)
       broadcast_snapshot(camera_id, data)
       response = store(camera_id, data, notes)
