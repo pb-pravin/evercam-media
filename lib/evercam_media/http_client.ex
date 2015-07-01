@@ -15,18 +15,33 @@ defmodule EvercamMedia.HTTPClient do
 
   def get(:digest_auth, url, username, password) do
     response = get(url)
-    digest  = get_digest(url, username, password) # Need to implement it.
-    HTTPotion.get url, headers: ["Authorization": digest]
+    get(:digest_auth, response, url, username, password)
+  end
+
+  def get(:cookie_auth, snapshot_url, username, password) do
+    u = URI.parse(snapshot_url)
+    login_url = u.scheme <> "://" <> u.authority <> "/login.cgi"
+    cookie = get_cookie(login_url, username, password)
+    HTTPotion.get snapshot_url, [headers: ["Cookie": cookie]]
   end
 
   def get(:digest_auth, response, url, username, password) do
-    digest_token =  DigestAuth.get_digest_token(response, url, user, password)
+    digest_token =  DigestAuth.get_digest_token(response, url, username, password)
     HTTPotion.get url, headers: ["Authorization": "Digest #{digest_token}"]
   end
 
-  def get(:token_auth, url, username, password) do
-    cookie = "AIROS_SESSIONID=cefaf2910bfe0c14113233fe825d50e0"
-    HTTPotion.get url, headers: ["Cookie": cookie]
+  defp get_cookie(url, username, password) do
+    request = HTTPotion.get url
+    cookie_string = Dict.get(request.headers, :"Set-Cookie") |> Enum.join(",")
+    cookie = Regex.run(~r/(AIROS_SESSIONID=[a-z0-9]+)/, cookie_string)
+             |> hd
+    HTTPotion.post url, [body: multipart_text(username, password),
+      headers: ["Content-Type": "multipart/form-data; boundary=----WebKitFormBoundaryEq1VsbBovj79sSoL", "Cookie": cookie]]
+    cookie
+  end
+
+  defp multipart_text(username, password) do
+    "------WebKitFormBoundaryEq1VsbBovj79sSoL\r\nContent-Disposition: form-data;name=\"uri\"\r\n\r\n\r\n------WebKitFormBoundaryEq1VsbBovj79sSoL\r\nContent-Disposition:form-data; name=\"username\"\r\n\r\n#{username}\r\n------WebKitFormBoundaryEq1VsbBovj79sSoL\r\nContent-Disposition: form-data; name=\"password\"\r\n\r\n#{password}\r\n------WebKitFormBoundaryEq1VsbBovj79sSoL\r\nContent-Disposition: form-data; name=\"Submit\"\r\n\r\nLogin\r\n------WebKitFormBoundaryEq1VsbBovj79sSoL\r\n"
   end
 end
 
@@ -45,7 +60,6 @@ defmodule EvercamMedia.HTTPClient.DigestAuth do
                 url.path,
                 nonce,
                 cnonce)
-    digest =
       [{"username", username},
        {"realm", realm},
        {"nonce", nonce},
