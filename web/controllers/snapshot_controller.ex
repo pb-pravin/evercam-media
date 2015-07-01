@@ -64,7 +64,19 @@ defmodule EvercamMedia.SnapshotController do
     try do
       [url, auth, credentials, time, _] = decode_request_token(token)
       # check_token_expiry(time)
-      data = HTTPClient.get(url, auth).body
+      response = case auth do
+        ":" -> HTTPClient.get(url)
+        _ -> [username, password] = String.split(auth, ":")
+             response = HTTPClient.get(:basic_auth, url, username, password)
+       end
+
+      data = case response.status_code do
+        200 ->  response.body
+        401 ->  HTTPClient.get(:digest_auth, response, url, username, password).body
+        # How to call/identify if the camera needs Cookie auth?
+        _ -> raise "Oops! Error getting response from camera."
+      end
+
       check_jpg(data)
       broadcast_snapshot(camera_id, data)
       response = store(camera_id, data, notes)

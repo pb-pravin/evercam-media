@@ -9,16 +9,6 @@ defmodule EvercamMedia.HTTPClient do
     get(url)
   end
 
-  def get(url, auth) do
-    [username, password] = String.split(auth, ":")
-    response = get(:basic_auth, url, username, password)
-    case response.status_code do
-      200 ->  response
-      401 ->  get(:digest_auth, response, url, username, password)
-      _ -> raise "Oops! Error getting response from camera."
-    end
-  end
-
   def get(:basic_auth, url, username, password) do
     HTTPotion.get url, [:basic_auth, {username, password}]
   end
@@ -35,8 +25,8 @@ defmodule EvercamMedia.HTTPClient do
   end
 
   def get(:token_auth, url, username, password) do
-    # To be implemented
-    #  HTTPotion.get url, headers: ["Cookie": cookie]
+    cookie = "AIROS_SESSIONID=cefaf2910bfe0c14113233fe825d50e0"
+    HTTPotion.get url, headers: ["Cookie": cookie]
   end
 end
 
