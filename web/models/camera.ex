@@ -68,6 +68,7 @@ defmodule Camera do
 
   def recording?(camera) do
     recording_cameras = [
+      "bankers",
       "beefcammobile",
       "bennett",
       "carrollszoocam",
