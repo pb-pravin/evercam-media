@@ -63,20 +63,18 @@ defmodule EvercamMedia.SnapshotController do
   defp snapshot(camera_id, token, notes \\ "Evercam Proxy") do
     try do
       [url, auth, credentials, time, _] = decode_request_token(token)
-      # check_token_expiry(time)
-      response = case auth do
-        ":" -> HTTPClient.get(url)
-        _ -> [username, password] = String.split(auth, ":")
-             response = HTTPClient.get(:basic_auth, url, username, password)
-       end
+      [username, password] = String.split(auth, ":")
+      camera = Camera.by_exid(camera_id) |> EvercamMedia.Repo.one |> EvercamMedia.Repo.preload(:vendor_model)
+      vendor_model = camera.vendor_model |> EvercamMedia.Repo.preload(:vendor)
+      vendor = vendor_model.vendor
 
-      data = case response.status_code do
-        200 ->  response.body
-        401 ->  HTTPClient.get(:digest_auth, response, url, username, password).body
-        # How to call/identify if the camera needs Cookie auth?
-        _ -> raise "Oops! Error getting response from camera."
+      response = case vendor.exid do
+        "samsung" -> HTTPClient.get(:digest_auth, url, username, password)
+        "ubiquity" -> HTTPClient.get(:cookie_auth, url, username, password)
+        _ -> HTTPClient.get(:basic_auth, url, username, password)
       end
 
+      data = response.body
       check_jpg(data)
       broadcast_snapshot(camera_id, data)
       response = store(camera_id, data, notes)
