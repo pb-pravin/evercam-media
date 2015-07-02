@@ -1,4 +1,3 @@
-[![Stories in Ready](https://badge.waffle.io/evercam/evercam-media.png?label=ready&title=Ready)](https://waffle.io/evercam/evercam-media)
 # Evercam Media
 
 Evercam Media is the component that is responsible for talking directly to the camera. Consider it as a "proxy" for all commands. Processes here request either snapshots or streams and then send them to the API, S3 Storage, or directly to any of the clients (e.g. Evercam-Dashboard , Evercam-Play-Android , Evercam-Play-iOS)
@@ -9,6 +8,7 @@ Evercam Media is the component that is responsible for talking directly to the c
 | Version  | 1.0 |
 | Evercam API Version  | 1.0  |
 | Licence | [AGPL](https://tldrlegal.com/license/gnu-affero-general-public-license-v3-%28agpl-3.0%29) |
+| Waffle Issues  | [![Stories in Ready](https://badge.waffle.io/evercam/evercam-media.png?label=ready&title=Ready)](https://waffle.io/evercam/evercam-media) |
 
 ## Features
 
