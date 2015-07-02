@@ -115,7 +115,12 @@ defmodule EvercamMedia.Snapshot do
     Repo.update camera
 
     unless camera_is_online == status do
-      log_camera_status(camera.id, status, timestamp)
+      try do
+        log_camera_status(camera.id, status, timestamp)
+      rescue
+        _error ->
+          error_handler(_error)
+      end
       invalidate_cache(camera_id)
     end
   end
