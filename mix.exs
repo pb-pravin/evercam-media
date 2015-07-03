@@ -3,7 +3,7 @@ defmodule EvercamMedia.Mixfile do
 
   def project do
     [app: :evercam_media,
-     version: get_version,
+     version: "1.0.0",
      elixir: "~> 1.0",
      elixirc_paths: ["lib", "web"],
      build_embedded: Mix.env == :prod,
@@ -57,17 +57,5 @@ defmodule EvercamMedia.Mixfile do
      {:eredis, github: 'wooga/eredis', tag: 'v1.0.5', override: true},
      {:uuid, github: 'zyro/elixir-uuid', override: true},
      {:exrm, "~> 0.14.16"}]
-  end
-
-  defp get_version do
-    version = :os.cmd('git describe --always --tags')
-    |> List.to_string
-    |> String.strip(?\n)
-    |> String.split("-")
-
-    case version do
-      [tag] -> tag
-      [tag, _commits_since_tag, commit] -> "#{tag}-#{commit}"
-    end
   end
 end
