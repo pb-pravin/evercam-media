@@ -1,6 +1,6 @@
 # Evercam Media
 
-Evercam Media is the component that is responsible for talking directly to the camera. Consider it as a "proxy" for all commands. Processes here request either snapshots or streams and then send them to the API, S3 Storage, or directly to any of the clients (e.g. Evercam-Dashboard , Evercam-Play-Android , Evercam-Play-iOS)
+Evercam Media is the component that is responsible for talking directly to the camera. Consider it as a "proxy" for all commands. Processes here request either snapshots or streams and then send them to the API, S3 Storage, or directly to any of the clients (e.g. Evercam-Dashboard, Evercam-Play-Android, Evercam-Play-iOS).
 
 | Name   | Evercam Media  |
 | --- | --- |
@@ -19,6 +19,8 @@ Evercam Media is the component that is responsible for talking directly to the c
 * store snapshots to S3 bucket
 
 ## Come on in, the water's warm :)
+
+To setup the development environment follow the instructions at: [evercam-devops](https://github.com/evercam/evercam-devops)
 
 We've identified some tasks as good one's to just "Dip your toe" into our codebase: [Toe Dipper Issues](https://github.com/evercam/evercam-media/labels/Difficulty%20-%20Toe%20Dipper)
 
