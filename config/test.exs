@@ -12,8 +12,9 @@ config :logger, level: :warn
 # Configure your database
 config :evercam_media, EvercamMedia.Repo,
   adapter: Ecto.Adapters.Postgres,
+  extensions: [{EvercamMedia.Types.JSON.Extension, library: Poison}],
   username: "postgres",
   password: "postgres",
-  database: "media_test",
+  database: "evercam_tst",
   size: 1,
   max_overflow: false
