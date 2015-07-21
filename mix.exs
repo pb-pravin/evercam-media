@@ -34,6 +34,7 @@ defmodule EvercamMedia.Mixfile do
     :porcelain,
     :postgrex,
     :timex,
+    :calendar,
     :uuid
   ]
 
@@ -49,6 +50,7 @@ defmodule EvercamMedia.Mixfile do
      {:httpotion, github: "myfreeweb/httpotion"},
      {:ibrowse, github: "cmullaparthi/ibrowse", tag: "v4.1.1", override: true},
      {:dotenv, "~> 0.0.4"},
+     {:calendar, "~> 0.8.0"},
      {:timex, "~> 0.13.3"},
      {:porcelain, "~> 2.0"},
      {:mini_s3, github: "ericmj/mini_s3", branch: "hex-fixes"},
