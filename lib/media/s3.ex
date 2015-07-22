@@ -16,7 +16,8 @@ defmodule EvercamMedia.S3 do
     # TODO: replace this with a proper s3 client
 
     tmp_path = "/tmp/#{camera_id}-#{timestamp}.jpg"
-    File.write! tmp_path, image 
+    File.write! tmp_path, image
+    {:ok, body} = File.read(tmp_path)
     date = Calendar.DateTime.now!("UTC") |> Calendar.DateTime.Format.httpdate
     host = "#{System.get_env("AWS_BUCKET")}.s3.amazonaws.com"
     url = "#{host}#{file_path}"
@@ -25,11 +26,13 @@ defmodule EvercamMedia.S3 do
     signature = :crypto.hmac(:sha, System.get_env("AWS_SECRET_KEY"), string) |> Base.encode64
     authorization = "AWS #{System.get_env("AWS_ACCESS_KEY")}:#{signature}"
 
-    headers = ["Host": host,
-               "Date": date,
-               "Content-Type": content_type,
-               "Authorization": authorization]
-    response = HTTPotion.put(url, [body: tmp_path, headers: headers])
+    headers = [
+      "Host": host,
+      "Date": date,
+      "Content-Type": content_type,
+      "Authorization": authorization
+    ]
+    response = HTTPotion.put(url, [body: body, headers: headers])
     File.rm tmp_path
 
     if response.status_code != 200 do
