@@ -2,6 +2,7 @@ defmodule EvercamMedia.SnapshotController do
   use Phoenix.Controller
   use Timex
   import EvercamMedia.Snapshot
+  alias EvercamMedia.HTTPClient
   require Logger
   plug :action
 
@@ -62,8 +63,15 @@ defmodule EvercamMedia.SnapshotController do
   defp snapshot(camera_id, token, notes \\ "Evercam Proxy") do
     try do
       [url, auth, credentials, time, _] = decode_request_token(token)
-      # check_token_expiry(time)
-      data = fetch(url, auth)
+      [username, password] = String.split(auth, ":")
+      vendor_exid = Camera.get_vendor_exid_by_camera_exid(camera_id)
+      response = case vendor_exid do
+        "samsung" -> HTTPClient.get(:digest_auth, url, username, password)
+        "ubiquity" -> HTTPClient.get(:cookie_auth, url, username, password)
+        _ -> HTTPClient.get(:basic_auth, url, username, password)
+      end
+
+      data = response.body
       check_jpg(data)
       broadcast_snapshot(camera_id, data)
       response = store(camera_id, data, notes)
