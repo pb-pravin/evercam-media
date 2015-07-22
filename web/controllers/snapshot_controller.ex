@@ -64,11 +64,8 @@ defmodule EvercamMedia.SnapshotController do
     try do
       [url, auth, credentials, time, _] = decode_request_token(token)
       [username, password] = String.split(auth, ":")
-      camera = Camera.by_exid(camera_id) |> EvercamMedia.Repo.one |> EvercamMedia.Repo.preload(:vendor_model)
-      vendor_model = camera.vendor_model |> EvercamMedia.Repo.preload(:vendor)
-      vendor = vendor_model.vendor
-
-      response = case vendor.exid do
+      vendor_exid = Camera.get_vendor_exid_by_camera_exid(camera_id)
+      response = case vendor_exid do
         "samsung" -> HTTPClient.get(:digest_auth, url, username, password)
         "ubiquity" -> HTTPClient.get(:cookie_auth, url, username, password)
         _ -> HTTPClient.get(:basic_auth, url, username, password)
