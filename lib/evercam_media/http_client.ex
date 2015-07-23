@@ -10,7 +10,7 @@ defmodule EvercamMedia.HTTPClient do
   end
 
   def get(:basic_auth, url, username, password) do
-    HTTPotion.get url, [:basic_auth, {username, password}]
+    HTTPotion.get url, [basic_auth: {username, password}]
   end
 
   def get(:digest_auth, url, username, password) do
