@@ -67,7 +67,7 @@ defmodule EvercamMedia.SnapshotController do
       vendor_exid = Camera.get_vendor_exid_by_camera_exid(camera_id)
       response = case vendor_exid do
         "samsung" -> HTTPClient.get(:digest_auth, url, username, password)
-        "ubiquity" -> HTTPClient.get(:cookie_auth, url, username, password)
+        "ubiquiti" -> HTTPClient.get(:cookie_auth, url, username, password)
         _ -> HTTPClient.get(:basic_auth, url, username, password)
       end
 
