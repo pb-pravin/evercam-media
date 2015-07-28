@@ -32,12 +32,21 @@ defmodule EvercamMedia.HTTPClient do
 
   defp get_cookie(url, username, password) do
     request = HTTPotion.get url
-    cookie_string = Dict.get(request.headers, :"Set-Cookie") |> Enum.join(",")
-    cookie = Regex.run(~r/(AIROS_SESSIONID=[a-z0-9]+)/, cookie_string)
-             |> hd
+    cookie = parse_cookie_header(request)
     HTTPotion.post url, [body: multipart_text(username, password),
       headers: ["Content-Type": "multipart/form-data; boundary=----WebKitFormBoundaryEq1VsbBovj79sSoL", "Cookie": cookie]]
     cookie
+  end
+
+  defp parse_cookie_header(request) do
+    session_header = Dict.get(request.headers, :"Set-Cookie")
+    session_string = case session_header do
+      [hd|tl] -> session_header |> Enum.join(",")
+      _ ->  session_header
+    end
+
+    cookie = Regex.run(~r/(AIROS_SESSIONID=[a-z0-9]+)/, session_string)
+             |> hd
   end
 
   defp multipart_text(username, password) do
