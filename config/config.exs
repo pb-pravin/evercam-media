@@ -16,7 +16,7 @@ config :evercam_media, EvercamMedia.Endpoint,
            adapter: Phoenix.PubSub.PG2]
 
 config :logger, :console,
-  format: "$time $metadata[$level] $message\n",
+  format: "$date $time $metadata[$level] $message\n",
   metadata: [:request_id]
 
 config :nginx_rtmp,
