@@ -1,5 +1,4 @@
-%{"calendar": {:hex, :calendar, "0.8.0"},
-  "con_cache": {:hex, :con_cache, "0.6.1"},
+%{"con_cache": {:hex, :con_cache, "0.6.1"},
   "conform": {:hex, :conform, "0.11.0"},
   "corman": {:git, "git://github.com/EchoTeam/corman.git", "e3c4c9f602441b4d9b8f9f8ea2813b3d791ec9e1", [branch: "master"]},
   "cowboy": {:hex, :cowboy, "1.0.0"},
@@ -40,6 +39,5 @@
   "ranch": {:hex, :ranch, "1.0.0"},
   "ssl_verify_hostname": {:git, "https://github.com/benoitc/ssl_verify_hostname", "764647b07a2941b8f209a70635ff217e86918321", [tag: "1.0.1"]},
   "timex": {:hex, :timex, "0.13.3"},
-  "tzdata": {:hex, :tzdata, "0.1.6"},
   "uuid": {:git, "git://github.com/zyro/elixir-uuid.git", "5437a1b4986bfcb410c07450ece36b212c37c8e1", []},
   "worker_pool": {:git, "https://github.com/inaka/worker_pool.git", "293b6c5bdd1d5445fb362503a2ac35cba1c984cc", [tag: "1.0"]}}
