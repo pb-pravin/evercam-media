@@ -4,7 +4,6 @@ defmodule EvercamMedia.StreamController do
   alias EvercamMedia.Repo
   import EvercamMedia.Snapshot
   require Logger
-  plug :action
 
   def rtmp(conn, params) do
     conn

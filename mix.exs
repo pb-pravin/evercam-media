@@ -34,21 +34,24 @@ defmodule EvercamMedia.Mixfile do
     :porcelain,
     :postgrex,
     :timex,
+    :calendar,
     :uuid
   ]
 
   defp deps do
-    [{:phoenix, "~> 0.13"},
-     {:phoenix_ecto, "~> 0.4"},
-     {:phoenix_html, "~> 1.0"},
-     {:phoenix_live_reload, "~> 0.4", only: :dev},
+    [
+		 {:phoenix, "~> 0.15"},
+     {:phoenix_ecto, "~> 0.8"},
+     {:phoenix_html, "~> 1.4"},
+     {:phoenix_live_reload, "~> 0.5", only: :dev},
      {:postgrex, ">= 0.0.0"},
-     {:ecto, "~> 0.11.2"},
+     {:ecto, "~> 0.14"},
      {:cowboy, "~> 1.0"},
      {:con_cache, "~> 0.6.0"},
      {:httpotion, github: "myfreeweb/httpotion"},
      {:ibrowse, github: "cmullaparthi/ibrowse", tag: "v4.1.1", override: true},
      {:dotenv, "~> 0.0.4"},
+     {:calendar, "~> 0.8.0"},
      {:timex, "~> 0.13.3"},
      {:porcelain, "~> 2.0"},
      {:mini_s3, github: "ericmj/mini_s3", branch: "hex-fixes"},

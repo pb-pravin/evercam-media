@@ -20,7 +20,4 @@ defmodule EvercamMedia.Router do
     get "/on_play", StreamController, :rtmp
   end
 
-  socket "/ws", EvercamMedia do
-    channel "cameras:*", SnapshotChannel
-  end
 end

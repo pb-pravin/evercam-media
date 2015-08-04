@@ -4,7 +4,6 @@ defmodule EvercamMedia.SnapshotController do
   import EvercamMedia.Snapshot
   alias EvercamMedia.HTTPClient
   require Logger
-  plug :action
 
   def show(conn, params) do
     [code, response] = [200, ConCache.get(:cache, params["id"])]
