@@ -32,4 +32,4 @@ config :evercam_media, EvercamMedia.Repo,
   extensions: [{EvercamMedia.Types.JSON.Extension, library: Poison}],
   username: "postgres",
   password: "postgres",
-  database: "evercam_dev"
+  database: System.get_env["db"] || "evercam_dev"
