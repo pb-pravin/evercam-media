@@ -12,6 +12,7 @@ defmodule EvercamMedia.Router do
 
     get "/", PageController, :index
 
+    post "/v1/cameras/test", SnapshotController, :test
     get "/v1/cameras/:id/live/snapshot", SnapshotController, :show
     post "/v1/cameras/:id/recordings/snapshots", SnapshotController, :create
 

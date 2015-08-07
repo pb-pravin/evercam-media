@@ -22,6 +22,11 @@ defmodule EvercamMedia.SnapshotController do
     create_respond(conn, code, response, params, params["with_data"])
   end
 
+  def test(conn, params) do
+    [code, response] = snapshot_test(params["token"], params["vendor_exid"])
+    test_respond(conn, code, response, params)
+  end
+
   defp show_respond(conn, 200, response, _camera_id) do
     conn
     |> put_status(200)
@@ -60,6 +65,22 @@ defmodule EvercamMedia.SnapshotController do
     |> json response
   end
 
+  defp test_respond(conn, 200, response, params) do
+    data = "data:image/jpeg;base64,#{Base.encode64(response[:image])}"
+
+    conn
+    |> put_status(200)
+    |> put_resp_header("access-control-allow-origin", "*")
+    |> json %{data: data, status: "ok"}
+  end
+
+  defp test_respond(conn, code, response, _) do
+    conn
+    |> put_status(code)
+    |> put_resp_header("access-control-allow-origin", "*")
+    |> json response
+  end
+
   defp snapshot(camera_id, token, notes \\ "Evercam Proxy") do
     try do
       [url, auth, credentials, time, _] = decode_request_token(token)
@@ -86,6 +107,35 @@ defmodule EvercamMedia.SnapshotController do
       _error in [HTTPotion.HTTPError] ->
         timestamp = Ecto.DateTime.utc
         update_camera_status(camera_id, timestamp, false)
+        [504, %{message: "Camera seems to be offline."}]
+      _error ->
+        error_handler(_error)
+        [500, %{message: "Sorry, we dropped the ball."}]
+    end
+  end
+
+  defp snapshot_test(token, vendor_exid) do
+    try do
+      [url, auth, credentials, time, _] = decode_request_token(token)
+      [username, password] = String.split(auth, ":")
+      response = case vendor_exid do
+        "samsung" -> HTTPClient.get(:digest_auth, url, username, password)
+        "ubiquiti" -> HTTPClient.get(:cookie_auth, url, username, password)
+        _ -> HTTPClient.get(:basic_auth, url, username, password)
+      end
+
+      check_jpg(response.body)
+      data = %{image: response.body}
+
+      [200, data]
+    rescue
+      error in [FunctionClauseError] ->
+        error_handler(error)
+        [401, %{message: "Unauthorized."}]
+      _error in [SnapshotError] ->
+        [504, %{message: "Camera didn't respond with an image."}]
+      _error in [HTTPotion.HTTPError] ->
+        timestamp = Ecto.DateTime.utc
         [504, %{message: "Camera seems to be offline."}]
       _error ->
         error_handler(_error)
