@@ -6,6 +6,7 @@ defmodule Camera do
     belongs_to :vendor_model, VendorModel, foreign_key: :model_id
     has_many :camera_shares, CameraShare
     has_many :snapshots, Snapshot
+    has_many :cloud_recordings, CloudRecording
     has_many :apps, App
 
     field :exid, :string
@@ -118,17 +119,12 @@ defmodule Camera do
       "zipyard-ranelagh-foh"
     ]
 
-    camera_with_apps = EvercamMedia.Repo.preload camera, :apps
-    if camera_with_apps.apps == [] do
-      if Enum.any?(recording_cameras, &(camera.exid == &1)) do
-        EvercamMedia.Repo.insert %App{camera_id: camera.id, cloud_recording: true}
-      else
-        EvercamMedia.Repo.insert %App{camera_id: camera.id}
-      end
-      camera_with_apps = EvercamMedia.Repo.preload camera, :apps
+    camera = EvercamMedia.Repo.preload camera, :cloud_recordings
+    cloud_recording = List.first(camera.cloud_recordings)
+    if cloud_recording == nil do
+      false
+    else
+      cloud_recording.frequency == 60
     end
-
-    apps = List.first camera_with_apps.apps
-    apps.cloud_recording
   end
 end

@@ -1,6 +1,7 @@
 defmodule EvercamMedia.Snapshot do
   alias EvercamMedia.Repo
   alias EvercamMedia.S3
+  alias EvercamMedia.HTTPClient
   require Logger
 
   def fetch(url, ":") do
@@ -26,7 +27,14 @@ defmodule EvercamMedia.Snapshot do
 
   def check_camera(args, retry \\ true) do
     try do
-      response = fetch(args[:url], args[:auth])
+      [username, password] = String.split(args[:auth], ":")
+      vendor_exid = Camera.get_vendor_exid_by_camera_exid(args[:camera_id])
+      response = case vendor_exid do
+        "samsung" -> HTTPClient.get(:digest_auth, args[:url], username, password)
+        "ubiquiti" -> HTTPClient.get(:cookie_auth, args[:url], username, password)
+        _ -> HTTPClient.get(:basic_auth, args[:url], username, password)
+      end
+      response = response.body
       check_jpg(response)
       broadcast_snapshot(args[:camera_id], response)
       store(args[:camera_id], response, "Evercam Proxy")
