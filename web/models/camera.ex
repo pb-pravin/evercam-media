@@ -121,7 +121,10 @@ defmodule Camera do
 
     camera = EvercamMedia.Repo.preload camera, :cloud_recordings
     cloud_recording = List.first(camera.cloud_recordings)
-
-    cloud_recording.frequency == 60
+    if cloud_recording == nil do
+      false
+    else
+      cloud_recording.frequency == 60
+    end
   end
 end

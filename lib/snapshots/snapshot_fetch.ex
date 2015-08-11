@@ -34,7 +34,7 @@ defmodule EvercamMedia.Snapshot do
         "ubiquiti" -> HTTPClient.get(:cookie_auth, args[:url], username, password)
         _ -> HTTPClient.get(:basic_auth, args[:url], username, password)
       end
-      response = fetch(args[:url], args[:auth])
+      response = response.body
       check_jpg(response)
       broadcast_snapshot(args[:camera_id], response)
       store(args[:camera_id], response, "Evercam Proxy")
