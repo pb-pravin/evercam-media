@@ -5,7 +5,7 @@ defmodule EvercamMedia.Mixfile do
     [app: :evercam_media,
      version: "1.0.0",
      elixir: "~> 1.0",
-     elixirc_paths: ["lib", "web"],
+     elixirc_paths: elixirc_paths(Mix.env),
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      compilers: [:phoenix] ++ Mix.compilers,
@@ -36,6 +36,11 @@ defmodule EvercamMedia.Mixfile do
     :timex,
     :uuid
   ]
+
+  # Specifies which paths to compile per environment
+  defp elixirc_paths(:test), do: ["lib", "web", "test/support"]
+  defp elixirc_paths(_),     do: ["lib", "web"]
+
 
   defp deps do
     [{:phoenix, "~> 0.13"},
