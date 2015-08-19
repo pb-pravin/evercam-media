@@ -10,9 +10,9 @@ defmodule EvercamMedia.ONVIFClient do
     
      url = "#{base_url}/onvif/" <> case service do
                     :ptz -> "PTZ"
-							      :device ->"device_service"
-							      :media -> "Media" 
-																														end
+		    :device ->"device_service"
+		    :media -> "Media" 
+		end
 		 
      response =  HTTPotion.post url, [body: gen_onvif_request(service, method, username, password, parameters), headers: ["Content-Type": "application/soap+xml", "SOAPAction": "http://www.w3.org/2003/05/soap-envelope"]] 
 
