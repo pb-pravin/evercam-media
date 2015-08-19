@@ -3,7 +3,7 @@ defmodule PTZTest do
   alias EvercamMedia.ONVIFPTZ
   
   test "get_nodes method on hikvision camera" do
-    {:ok, response} = ONVIFPTZ.get_nodes("149.13.244.32", "8100", "admin", "mehcam")
+    {:ok, response} = ONVIFPTZ.get_nodes("http://149.13.244.32:8100", "admin", "mehcam")
     result_map = Poison.Parser.parse!(response)
     assert  result_map 
             |> Map.get("PTZNode")
@@ -15,7 +15,7 @@ defmodule PTZTest do
    end 
 
   test "get_configurations method on hikvision camera" do
-    {:ok, response} = ONVIFPTZ.get_configurations("149.13.244.32", "8100", "admin", "mehcam")
+    {:ok, response} = ONVIFPTZ.get_configurations("http://149.13.244.32:8100", "admin", "mehcam")
     result_map = Poison.Parser.parse!(response)
     assert result_map
            |> Map.get("PTZConfiguration")
@@ -26,7 +26,7 @@ defmodule PTZTest do
   end 
 
   test "get_presets method on hikvision camera" do
-    {:ok, response} = ONVIFPTZ.get_presets("149.13.244.32", "8100", "admin", "mehcam", "Profile_1")
+    {:ok, response} = ONVIFPTZ.get_presets("http://149.13.244.32:8100", "admin", "mehcam", "Profile_1")
     [first_preset | _] = 
       Poison.Parser.parse!(response)
       |> Map.get("Presets")
@@ -37,12 +37,12 @@ defmodule PTZTest do
   end   
 
   test "goto_preset method on hikvision camera" do
-    {:ok, response} = ONVIFPTZ.goto_preset("149.13.244.32", "8100", "admin", "mehcam", "Profile_1", "6")
+    {:ok, response} = ONVIFPTZ.goto_preset("http://149.13.244.32:8100", "admin", "mehcam", "Profile_1", "6")
     assert response == "{}"
   end   
   
   test "stop method on hikvision camera" do
-    {:ok, response} = ONVIFPTZ.stop("149.13.244.32", "8100", "admin", "mehcam", "Profile_1")
+    {:ok, response} = ONVIFPTZ.stop("http://149.13.244.32:8100", "admin", "mehcam", "Profile_1")
     assert response == "{}"
   end
 

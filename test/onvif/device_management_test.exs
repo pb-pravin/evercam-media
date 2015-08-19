@@ -3,14 +3,14 @@ defmodule DeviceManagementTest do
   alias EvercamMedia.ONVIFDeviceManagement
   
   test "get_system_date_and_time method on hikvision camera" do
-    {:ok, response} = ONVIFDeviceManagement.get_system_date_and_time("149.13.244.32", "8100", "admin", "mehcam")
+    {:ok, response} = ONVIFDeviceManagement.get_system_date_and_time("http://149.13.244.32:8100", "admin", "mehcam")
     assert Poison.Parser.parse!(response)
              |> Map.get("Date")
              |> Map.get("Year") == "2015"
   end   
 
  test "get_device_information method on hikvision camera" do
-    {:ok, response} = ONVIFDeviceManagement.get_device_information("149.13.244.32", "8100", "admin", "mehcam")
+    {:ok, response} = ONVIFDeviceManagement.get_device_information("http://149.13.244.32:8100", "admin", "mehcam")
     result_map = Poison.Parser.parse!(response)
 
     assert Map.get(result_map, "Manufacturer")  == "HIKVISION"
@@ -22,7 +22,7 @@ defmodule DeviceManagementTest do
  end   
 
  test "get_network_interfaces method on hikvision camera" do
-   {:ok, response} = ONVIFDeviceManagement.get_network_interfaces("149.13.244.32", "8100", "admin", "mehcam")
+   {:ok, response} = ONVIFDeviceManagement.get_network_interfaces("http://149.13.244.32:8100", "admin", "mehcam")
    result_map = Poison.Parser.parse!(response)
    assert result_map
           |> Map.get("IPv4")

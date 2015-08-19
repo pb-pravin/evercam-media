@@ -6,9 +6,9 @@ defmodule EvercamMedia.ONVIFClient do
   Record.defrecord :xmlAttribute, Record.extract(:xmlAttribute, from_lib: "xmerl/include/xmerl.hrl")
   
  
-  def onvif_call(host, port, service, method, xpath, username, password, parameters \\ "") do
+  def onvif_call(base_url, service, method, xpath, username, password, parameters \\ "") do
     
-     url = "http://#{host}:#{port}/onvif/" <> case service do
+     url = "#{base_url}/onvif/" <> case service do
                     :ptz -> "PTZ"
 							      :device ->"device_service"
 							      :media -> "Media" 

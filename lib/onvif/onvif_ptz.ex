@@ -2,18 +2,18 @@ defmodule EvercamMedia.ONVIFPTZ do
 
   alias EvercamMedia.ONVIFClient
 
-  def get_nodes(host, port, username, password) do
-    ptz_request(host, port,"GetNodes", 
+  def get_nodes(url, username, password) do
+    ptz_request(url, "GetNodes", 
                 "/env:Envelope/env:Body/tptz:GetNodesResponse", username, password)
    end
 
-  def get_configurations(host, port, username, password) do
-    ptz_request(host, port,"GetConfigurations", 
+  def get_configurations(url, username, password) do
+    ptz_request(url, "GetConfigurations", 
                 "/env:Envelope/env:Body/tptz:GetConfigurationsResponse", username, password)
   end
 
-  def get_presets(host, port, username, password, profile_token) do
-    {:ok, response} = ptz_request(host, port,"GetPresets", 
+  def get_presets(url, username, password, profile_token \\ "Profile_1") do
+    {:ok, response} = ptz_request(url, "GetPresets", 
                                   "/env:Envelope/env:Body/tptz:GetPresetsResponse", 
                                   username, password,
                                   "<ProfileToken>#{profile_token}</ProfileToken>")
@@ -28,16 +28,16 @@ defmodule EvercamMedia.ONVIFPTZ do
           |> IO.iodata_to_binary}
   end
 
-  def get_status(host, port, username, password, profile_token) do
-    ptz_request(host, port,"GetStatus", 
+  def get_status(url, username, password, profile_token) do
+    ptz_request(url, "GetStatus", 
                "/env:Envelope/env:Body/tptz:GetStatusResponse",
                username, password,
                "<ProfileToken>#{profile_token}</ProfileToken>")
   end
 
 
-  def goto_preset(host, port, username, password, profile_token, preset_token, speed \\ []) do
-    ptz_request(host, port,"GotoPreset", "/env:Envelope/env:Body/tptz:GotoPresetResponse", 
+  def goto_preset(url, username, password, profile_token, preset_token, speed \\ []) do
+    ptz_request(url, "GotoPreset", "/env:Envelope/env:Body/tptz:GotoPresetResponse", 
                 username, password,
                 "<ProfileToken>#{profile_token}</ProfileToken>
                  <PresetToken>#{preset_token}</PresetToken>"
@@ -47,8 +47,8 @@ defmodule EvercamMedia.ONVIFPTZ do
                     end)
   end
  
-  def relative_move(host, port, username, password, profile_token, translation, speed \\ []) do
-    ptz_request(host, port, "RelativeMove", 
+  def relative_move(url, username, password, profile_token, translation, speed \\ []) do
+    ptz_request(url, "RelativeMove", 
                 "/env:Envelope/env:Body/tptz:GotoPresetResponse",username, password,
                                   "<ProfileToken>#{profile_token}</ProfileToken>
                                   <Translation>#{pan_tilt_zoom_vector translation}</Translation>"
@@ -58,8 +58,8 @@ defmodule EvercamMedia.ONVIFPTZ do
 	                                         end)
   end
  
-  def stop(host, port, username, password, profile_token) do
-    ptz_request(host, port,"Stop", 
+  def stop(url, username, password, profile_token) do
+    ptz_request(url, "Stop", 
                 "/env:Envelope/env:Body/tptz:StopResponse", 
                 username, password,
                 "<ProfileToken>#{profile_token}</ProfileToken>")
@@ -79,7 +79,7 @@ defmodule EvercamMedia.ONVIFPTZ do
     pan_tilt <> zoom
   end
 
-  defp ptz_request(host, port, method, xpath, username, password, parameters \\ "") do
-    ONVIFClient.onvif_call(host, port, :ptz, method, xpath, username, password, parameters) 
+  defp ptz_request(url, method, xpath, username, password, parameters \\ "") do
+    ONVIFClient.onvif_call(url, :ptz, method, xpath, username, password, parameters) 
   end
 end

@@ -3,7 +3,7 @@ defmodule MediaTest do
   alias EvercamMedia.ONVIFMedia
   
   test "get_profiles method on hikvision camera" do
-    {:ok, response} = ONVIFMedia.get_profiles("149.13.244.32", "8100", "admin", "mehcam")
+    {:ok, response} = ONVIFMedia.get_profiles("http://149.13.244.32:8100", "admin", "mehcam")
     [profile_1, profile_2, profile_3] = 
       Poison.Parser.parse!(response)
       |> Map.get("Profiles")
