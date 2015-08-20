@@ -84,7 +84,7 @@ defmodule EvercamMedia.ONVIFClient do
     [response] = Enum.map(event_elements, fn(event_element) -> 
                                             parse(xmlElement(event_element, :content))
                                            end)
-    Poison.Encoder.encode(response,nil) |> IO.iodata_to_binary
+    Poison.Encoder.encode(response,nil) 
   end
 
   defp parse(node) do
