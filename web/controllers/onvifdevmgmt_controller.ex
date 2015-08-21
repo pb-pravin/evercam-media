@@ -14,7 +14,6 @@ defmodule EvercamMedia.ONVIFDeviceManagementController do
       |> String.split ":"
     {:ok, response} = ONVIFDeviceManagement.get_network_interfaces(url, username, password) 
     mac_address = response 
-                  |> Poison.Parser.parse!
                   |> Map.get("Info")
                   |> Map.get("HwAddress")     
     macaddr_respond(conn, 200, mac_address)

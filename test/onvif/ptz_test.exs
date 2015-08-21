@@ -4,23 +4,21 @@ defmodule PTZTest do
   
   test "get_nodes method on hikvision camera" do
     {:ok, response} = ONVIFPTZ.get_nodes("http://149.13.244.32:8100", "admin", "mehcam")
-    result_map = Poison.Parser.parse!(response)
-    assert  result_map 
-            |> Map.get("PTZNode")
-            |> Map.get("Name") == "PTZNODE"
+    assert response 
+           |> Map.get("PTZNode")
+           |> Map.get("Name") == "PTZNODE"
     
-    assert result_map 
+    assert response 
            |> Map.get("PTZNode")
            |> Map.get("token") == "PTZNODETOKEN"
    end 
 
   test "get_configurations method on hikvision camera" do
     {:ok, response} = ONVIFPTZ.get_configurations("http://149.13.244.32:8100", "admin", "mehcam")
-    result_map = Poison.Parser.parse!(response)
-    assert result_map
+    assert response
            |> Map.get("PTZConfiguration")
            |> Map.get("Name") == "PTZ"
-    assert result_map
+    assert response
            |> Map.get("PTZConfiguration")
            |> Map.get("NodeToken") == "PTZNODETOKEN"
   end 
@@ -28,7 +26,7 @@ defmodule PTZTest do
   test "get_presets method on hikvision camera" do
     {:ok, response} = ONVIFPTZ.get_presets("http://149.13.244.32:8100", "admin", "mehcam", "Profile_1")
     [first_preset | _] = 
-      Poison.Parser.parse!(response)
+      response
       |> Map.get("Presets")
     assert first_preset 
            |> Map.get("Name") == "Back Main Yard"
@@ -38,12 +36,12 @@ defmodule PTZTest do
 
   test "goto_preset method on hikvision camera" do
     {:ok, response} = ONVIFPTZ.goto_preset("http://149.13.244.32:8100", "admin", "mehcam", "Profile_1", "6")
-    assert response == "{}"
+    assert response == %{}
   end   
   
   test "stop method on hikvision camera" do
     {:ok, response} = ONVIFPTZ.stop("http://149.13.244.32:8100", "admin", "mehcam", "Profile_1")
-    assert response == "{}"
+    assert response == %{}
   end
 
   test "pan_tilt coordinates available" do

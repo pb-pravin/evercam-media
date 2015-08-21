@@ -20,12 +20,10 @@ defmodule EvercamMedia.ONVIFPTZ do
     {:ok, Map.put(%{}, 
                   "Presets",
                   response
-		  |>  Poison.Parser.parse!
                   |>  Map.get("Preset")
                   |>  Enum.filter(&(Map.get(&1, "Name") != nil))
           )
-          |> Poison.Encoder.encode(nil)
-          |> IO.iodata_to_binary}
+        }
   end
 
   def get_status(url, username, password, profile_token) do
