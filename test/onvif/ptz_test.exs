@@ -36,12 +36,33 @@ defmodule PTZTest do
 
   test "goto_preset method on hikvision camera" do
     {:ok, response} = ONVIFPTZ.goto_preset("http://149.13.244.32:8100", "admin", "mehcam", "Profile_1", "6")
-    assert response == %{}
+    assert response == :ok
   end   
+
+  test "set_preset method on hikvision camera" do
+    {:ok, response} = ONVIFPTZ.set_preset("http://149.13.244.32:8100", "admin", "mehcam", "Profile_1", "99", "Jose's Preset")
+	  assert response |> Map.get("PresetToken") == "99"
+  end
+
+  test "remove_preset method on hikvision camera" do
+    {:ok, response} = ONVIFPTZ.remove_preset("http://149.13.244.32:8100", "admin", "mehcam", "Profile_1", "99")
+	  assert response = :ok
+  end
+
+  test "set_home_position method on hikvision camera" do
+    {:ok, response} = ONVIFPTZ.set_home_position("http://149.13.244.32:8100", "admin", "mehcam", "Profile_1")
+	  assert response == :ok
+  end
+
+  test "goto_home_position method on hikvision camera" do
+    {:ok, response} = ONVIFPTZ.goto_home_position("http://149.13.244.32:8100", "admin", "mehcam", "Profile_1")
+	  assert response == :ok
+  end   
+
   
   test "stop method on hikvision camera" do
     {:ok, response} = ONVIFPTZ.stop("http://149.13.244.32:8100", "admin", "mehcam", "Profile_1")
-    assert response == %{}
+    assert response == :ok
   end
 
   test "pan_tilt coordinates available" do

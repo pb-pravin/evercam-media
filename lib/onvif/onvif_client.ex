@@ -84,7 +84,11 @@ defmodule EvercamMedia.ONVIFClient do
     [response] = Enum.map(event_elements, fn(event_element) -> 
                                             parse(xmlElement(event_element, :content))
                                            end)
-    response 
+    if Map.size(response) == 0 do
+      :ok
+    else
+      response
+    end
   end
 
   defp parse(node) do

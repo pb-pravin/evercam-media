@@ -17,6 +17,11 @@ defmodule EvercamMedia.Router do
     post "/v1/cameras/:id/recordings/snapshots", SnapshotController, :create
 
     get "/onvif/cameras/:camera_id/ptz/presets", ONVIFPTZController, :presets
+    post "/onvif/cameras/:camera_id/ptz/home", ONVIFPTZController, :home
+    post "/onvif/cameras/:camera_id/ptz/home/set", ONVIFPTZController, :sethome
+    post "/onvif/cameras/:camera_id/ptz/presets/:preset_token", ONVIFPTZController, :setpreset
+    post "/onvif/cameras/:camera_id/ptz/presets/go/:preset_token", ONVIFPTZController, :gotopreset
+    post "/onvif/cameras/:camera_id/ptz/stop", ONVIFPTZController, :stop
     
     get "/onvif/cameras/:camera_id/macaddr", ONVIFDeviceManagementController, :macaddr
 

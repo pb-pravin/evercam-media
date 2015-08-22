@@ -12,7 +12,7 @@ defmodule EvercamMedia.ONVIFPTZ do
                 "/env:Envelope/env:Body/tptz:GetConfigurationsResponse", username, password)
   end
 
-  def get_presets(url, username, password, profile_token \\ "Profile_1") do
+  def get_presets(url, username, password, profile_token) do
     {:ok, response} = ptz_request(url, "GetPresets", 
                                   "/env:Envelope/env:Body/tptz:GetPresetsResponse", 
                                   username, password,
@@ -48,14 +48,61 @@ defmodule EvercamMedia.ONVIFPTZ do
   def relative_move(url, username, password, profile_token, translation, speed \\ []) do
     ptz_request(url, "RelativeMove", 
                 "/env:Envelope/env:Body/tptz:GotoPresetResponse",username, password,
-                                  "<ProfileToken>#{profile_token}</ProfileToken>
-                                  <Translation>#{pan_tilt_zoom_vector translation}</Translation>"
-		                              <> case pan_tilt_zoom_vector speed do
-                                                   "" -> ""
-		                                   vector -> "<Speed>#{vector}</Speed>"
-	                                         end)
+                "<ProfileToken>#{profile_token}</ProfileToken>
+                <Translation>#{pan_tilt_zoom_vector translation}</Translation>"
+	        <> case pan_tilt_zoom_vector speed do
+                     "" -> ""
+	             vector -> "<Speed>#{vector}</Speed>"
+	       end)
+  end
+
+  
+  
+  def continuous_move(url, username, password, profile_token, velocity \\ []) do
+    ptz_request(url, "ContinousMove", 
+                "/env:Envelope/env:Body/tptz:ContinuousMoveResponse", username, password,
+                "<ProfileToken>#{profile_token}</ProfileToken>"
+	        <> case pan_tilt_zoom_vector velocity do
+                     "" -> ""
+	             vector -> "<Velocity>#{vector}</Velocity>"
+               end)
+  end
+
+
+  def goto_home_position(url, username, password, profile_token, speed \\ []) do
+    ptz_request(url,"GotoHomePosition", 
+                "/env:Envelope/env:Body/tptz:GotoHomePositionResponse", username, password,
+                "<ProfileToken>#{profile_token}</ProfileToken>"
+                <> case pan_tilt_zoom_vector speed do
+                     "" -> ""
+	             vector -> "<Speed>#{vector}</Speed>"
+                end)
+
   end
  
+  def remove_preset(url, username, password, profile_token, preset_token) do
+    ptz_request(url, "RemovePreset", 
+                "/env:Envelope/env:Body/tptz:RemovePresetResponse", username, password,
+                "<ProfileToken>#{profile_token}</ProfileToken>
+                <PresetToken>#{preset_token}</PresetToken>")
+  end
+
+  def set_preset(url, username, password, profile_token, preset_token, preset_name) do
+    ptz_request(url, "SetPreset", 
+                "/env:Envelope/env:Body/tptz:SetPresetResponse", username, password,
+                "<ProfileToken>#{profile_token}</ProfileToken>
+                <PresetName>#{preset_name}</PresetName>
+                <PresetToken>#{preset_token}</PresetToken>")
+  end
+
+
+  def set_home_position(url, username, password, profile_token) do
+    ptz_request(url ,"SetHomePosition", 
+                "/env:Envelope/env:Body/tptz:SetHomePositionResponse", username, password,
+                "<ProfileToken>#{profile_token}</ProfileToken>")
+
+  end
+						 
   def stop(url, username, password, profile_token) do
     ptz_request(url, "Stop", 
                 "/env:Envelope/env:Body/tptz:StopResponse", 
