@@ -16,10 +16,12 @@ defmodule EvercamMedia.Router do
     get "/v1/cameras/:id/live/snapshot", SnapshotController, :show
     post "/v1/cameras/:id/recordings/snapshots", SnapshotController, :create
 
+    get "/v1/cameras/:id/ptz/status", ONVIFPTZController, :status
     get "/v1/cameras/:id/ptz/presets", ONVIFPTZController, :presets
     post "/v1/cameras/:id/ptz/home", ONVIFPTZController, :home
     post "/v1/cameras/:id/ptz/home/set", ONVIFPTZController, :sethome
     post "/v1/cameras/:id/ptz/presets/:preset_token", ONVIFPTZController, :setpreset
+    post "/v1/cameras/:id/ptz/presets/create/:preset_name", ONVIFPTZController, :createpreset
     post "/v1/cameras/:id/ptz/presets/go/:preset_token", ONVIFPTZController, :gotopreset
     post "/v1/cameras/:id/ptz/stop", ONVIFPTZController, :stop
     

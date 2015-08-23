@@ -5,6 +5,12 @@ defmodule EvercamMedia.ONVIFPTZController do
   require Logger
   plug :action
 
+  def status(conn, params) do
+    [url, username, password] = get_camera_info(params["id"])
+    {:ok, response} = ONVIFPTZ.get_status(url, username, password, "Profile_1")    
+    default_respond(conn, 200, response)
+  end
+
   def presets(conn, params) do
     [url, username, password] = get_camera_info(params["id"])
     {:ok, response} = ONVIFPTZ.get_presets(url, username, password, "Profile_1")    
@@ -40,8 +46,15 @@ defmodule EvercamMedia.ONVIFPTZController do
     [url, username, password] = get_camera_info(params["id"])
     {:ok, response} = ONVIFPTZ.set_preset(url, username, 
                                                  password, "Profile_1",
-                                                 "Test Preset",
-                                                 params["preset_token"])
+                                                 "", params["preset_token"])
+    default_respond(conn, 200, response)
+  end
+
+  def createpreset(conn, params) do
+    [url, username, password] = get_camera_info(params["id"])
+    {:ok, response} = ONVIFPTZ.set_preset(url, username, 
+                                                 password, "Profile_1",
+                                                 params["preset_name"])
     default_respond(conn, 200, response)
   end
 
