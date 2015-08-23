@@ -36,7 +36,7 @@ defmodule EvercamMedia.ONVIFPTZController do
   end
 
    def gotopreset(conn, params) do
-    [url, username, password] = get_camera_info(params["camera_id"])
+    [url, username, password] = get_camera_info(params["id"])
     {:ok, response} = ONVIFPTZ.goto_preset(url, username, password, 
                                            "Profile_1", params["preset_token"])    
     default_respond(conn, 200, response)
