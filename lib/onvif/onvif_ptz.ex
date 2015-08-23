@@ -64,7 +64,7 @@ defmodule EvercamMedia.ONVIFPTZ do
                 "<ProfileToken>#{profile_token}</ProfileToken>"
 	        <> case pan_tilt_zoom_vector velocity do
                      "" -> ""
-	             vector -> "<Velocity>#{vector}</Velocity>"
+	                  vector -> "<Velocity>#{vector}</Velocity>"
                end)
   end
 
@@ -75,7 +75,7 @@ defmodule EvercamMedia.ONVIFPTZ do
                 "<ProfileToken>#{profile_token}</ProfileToken>"
                 <> case pan_tilt_zoom_vector speed do
                      "" -> ""
-	             vector -> "<Speed>#{vector}</Speed>"
+	                   vector  -> "<Speed>#{vector}</Speed>"
                 end)
 
   end
@@ -87,14 +87,19 @@ defmodule EvercamMedia.ONVIFPTZ do
                 <PresetToken>#{preset_token}</PresetToken>")
   end
 
-  def set_preset(url, username, password, profile_token, preset_token, preset_name) do
+  def set_preset(url, username, password, profile_token, preset_name \\ "", preset_token \\ "") do
     ptz_request(url, "SetPreset", 
                 "/env:Envelope/env:Body/tptz:SetPresetResponse", username, password,
-                "<ProfileToken>#{profile_token}</ProfileToken>
-                <PresetName>#{preset_name}</PresetName>
-                <PresetToken>#{preset_token}</PresetToken>")
+                "<ProfileToken>#{profile_token}</ProfileToken>"
+                <> case preset_name do
+                     "" -> ""
+                     _ -> "<PresetName>#{preset_name}</PresetName>"
+                   end
+                <> case preset_token do
+                     "" -> ""
+                     _ -> "<PresetToken>#{preset_token}</PresetToken>"
+                    end)
   end
-
 
   def set_home_position(url, username, password, profile_token) do
     ptz_request(url ,"SetHomePosition", 

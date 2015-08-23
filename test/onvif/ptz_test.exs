@@ -39,13 +39,10 @@ defmodule PTZTest do
     assert response == :ok
   end   
 
-  test "set_preset method on hikvision camera" do
-    {:ok, response} = ONVIFPTZ.set_preset("http://149.13.244.32:8100", "admin", "mehcam", "Profile_1", "99", "Jose's Preset")
-	  assert response |> Map.get("PresetToken") == "99"
-  end
-
-  test "remove_preset method on hikvision camera" do
-    {:ok, response} = ONVIFPTZ.remove_preset("http://149.13.244.32:8100", "admin", "mehcam", "Profile_1", "99")
+  test "set_preset and remove_preset method on hikvision camera" do
+    {:ok, response} = ONVIFPTZ.set_preset("http://149.13.244.32:8100", "admin", "mehcam", "Profile_1")
+	  preset_token = response |> Map.get("PresetToken")
+    {:ok, response} = ONVIFPTZ.remove_preset("http://149.13.244.32:8100", "admin", "mehcam", "Profile_1", preset_token)
 	  assert response = :ok
   end
 
