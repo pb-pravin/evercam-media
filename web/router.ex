@@ -26,6 +26,7 @@ defmodule EvercamMedia.Router do
     post "/v1/cameras/:id/ptz/continuous/start/:direction", ONVIFPTZController, :continuousmove
     post "/v1/cameras/:id/ptz/continuous/zoom/:mode", ONVIFPTZController, :continuouszoom
     post "/v1/cameras/:id/ptz/continuous/stop", ONVIFPTZController, :stop
+    post "/v1/cameras/:id/ptz/relative", ONVIFPTZController, :relativemove
     
     get "/v1/cameras/:id/macaddr", ONVIFDeviceManagementController, :macaddr
 

@@ -47,7 +47,7 @@ defmodule EvercamMedia.ONVIFPTZ do
  
   def relative_move(url, username, password, profile_token, translation, speed \\ []) do
     ptz_request(url, "RelativeMove", 
-                "/env:Envelope/env:Body/tptz:GotoPresetResponse",username, password,
+                "/env:Envelope/env:Body/tptz:RelativeMoveResponse",username, password,
                 "<ProfileToken>#{profile_token}</ProfileToken>
                 <Translation>#{pan_tilt_zoom_vector translation}</Translation>"
 	        <> case pan_tilt_zoom_vector speed do

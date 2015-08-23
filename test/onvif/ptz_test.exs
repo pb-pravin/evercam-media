@@ -56,6 +56,10 @@ defmodule PTZTest do
 	  assert response == :ok
   end   
 
+  test "relative_move method on hikvision camera" do
+    {:ok, response} = ONVIFPTZ.relative_move("http://149.13.244.32:8100", "admin", "mehcam", "Profile_1", [x: 0.0, y: 0.0, zoom: 0.0])
+	  assert response == :ok
+  end   
   
   test "stop method on hikvision camera" do
     {:ok, response} = ONVIFPTZ.continuous_move("http://149.13.244.32:8100", "admin", "mehcam", "Profile_1", [x: 0.1, y: 0.0])
