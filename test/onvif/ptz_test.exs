@@ -58,6 +58,8 @@ defmodule PTZTest do
 
   
   test "stop method on hikvision camera" do
+    {:ok, response} = ONVIFPTZ.continuous_move("http://149.13.244.32:8100", "admin", "mehcam", "Profile_1", [x: 0.1, y: 0.0])
+    assert response == :ok
     {:ok, response} = ONVIFPTZ.stop("http://149.13.244.32:8100", "admin", "mehcam", "Profile_1")
     assert response == :ok
   end

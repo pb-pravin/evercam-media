@@ -23,7 +23,9 @@ defmodule EvercamMedia.Router do
     post "/v1/cameras/:id/ptz/presets/:preset_token", ONVIFPTZController, :setpreset
     post "/v1/cameras/:id/ptz/presets/create/:preset_name", ONVIFPTZController, :createpreset
     post "/v1/cameras/:id/ptz/presets/go/:preset_token", ONVIFPTZController, :gotopreset
-    post "/v1/cameras/:id/ptz/stop", ONVIFPTZController, :stop
+    post "/v1/cameras/:id/ptz/continuous/start/:direction", ONVIFPTZController, :continuousmove
+    post "/v1/cameras/:id/ptz/continuous/zoom/:mode", ONVIFPTZController, :continuouszoom
+    post "/v1/cameras/:id/ptz/continuous/stop", ONVIFPTZController, :stop
     
     get "/v1/cameras/:id/macaddr", ONVIFDeviceManagementController, :macaddr
 

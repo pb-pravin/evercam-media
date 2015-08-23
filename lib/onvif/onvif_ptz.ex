@@ -59,7 +59,7 @@ defmodule EvercamMedia.ONVIFPTZ do
   
   
   def continuous_move(url, username, password, profile_token, velocity \\ []) do
-    ptz_request(url, "ContinousMove", 
+    ptz_request(url, "ContinuousMove", 
                 "/env:Envelope/env:Body/tptz:ContinuousMoveResponse", username, password,
                 "<ProfileToken>#{profile_token}</ProfileToken>"
 	        <> case pan_tilt_zoom_vector velocity do

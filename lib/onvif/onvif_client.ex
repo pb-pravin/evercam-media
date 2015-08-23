@@ -33,7 +33,7 @@ defmodule EvercamMedia.ONVIFClient do
     end
 
     {wsse_username, wsse_password, wsse_nonce, wsse_created} = get_wsse_header_data(username,password)
-
+   
     "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
      <SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://www.w3.org/2003/05/soap-envelope\"
           xmlns:wsse=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\"
