@@ -2,21 +2,21 @@ defmodule EvercamMedia.ONVIFDeviceManagement do
   alias EvercamMedia.ONVIFClient
 
   def get_system_date_and_time(url, username, password) do
-    device_management_request(url, "GetSystemDateAndTime", 
-                              "/env:Envelope/env:Body/tds:GetSystemDateAndTimeResponse/tds:SystemDateAndTime/tt:LocalDateTime", 
-                              username, password)
+    method = "GetSystemDateAndTime"
+    xpath = "/env:Envelope/env:Body/tds:GetSystemDateAndTimeResponse/tds:SystemDateAndTime/tt:LocalDateTime"
+    device_management_request(url, method, xpath, username, password)
   end
 
   def get_device_information(url, username, password) do
-    device_management_request(url, "GetDeviceInformation", 
-                              "/env:Envelope/env:Body/tds:GetDeviceInformationResponse", 
-                              username, password)
+    method = "GetDeviceInformation"
+    xpath = "/env:Envelope/env:Body/tds:GetDeviceInformationResponse"
+    device_management_request(url, method, xpath, username, password)
   end
 
   def get_network_interfaces(url, username, password) do
-    device_management_request(url, "GetNetworkInterfaces",
-                              "/env:Envelope/env:Body/tds:GetNetworkInterfacesResponse/tds:NetworkInterfaces", 
-                              username, password)
+    method = "GetNetworkInterfaces"
+    xpath = "/env:Envelope/env:Body/tds:GetNetworkInterfacesResponse/tds:NetworkInterfaces"
+    device_management_request(url, method, xpath, username, password)
   end
 
   def device_management_request(url, method, xpath,  username, password) do

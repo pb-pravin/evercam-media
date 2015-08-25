@@ -33,20 +33,19 @@ defmodule EvercamMedia.HTTPClient do
   defp get_cookie(url, username, password) do
     request = HTTPotion.get url
     cookie = parse_cookie_header(request)
-    HTTPotion.post url, [body: multipart_text(username, password),
-      headers: ["Content-Type": "multipart/form-data; boundary=----WebKitFormBoundaryEq1VsbBovj79sSoL", "Cookie": cookie]]
+    HTTPotion.post url, [body: multipart_text(username, password), headers: ["Content-Type": "multipart/form-data; boundary=----WebKitFormBoundaryEq1VsbBovj79sSoL", "Cookie": cookie]]
     cookie
   end
 
   defp parse_cookie_header(request) do
     session_header = Dict.get(request.headers, :"Set-Cookie")
-    session_string = case session_header do
-      [hd|tl] -> session_header |> Enum.join(",")
-      _ ->  session_header
-    end
+    session_string =
+      case session_header do
+        [hd|tl] -> session_header |> Enum.join(",")
+        _ ->  session_header
+      end
 
-    cookie = Regex.run(~r/(AIROS_SESSIONID=[a-z0-9]+)/, session_string)
-             |> hd
+    cookie = Regex.run(~r/(AIROS_SESSIONID=[a-z0-9]+)/, session_string) |> hd
   end
 
   defp multipart_text(username, password) do
@@ -62,33 +61,33 @@ defmodule EvercamMedia.HTTPClient.DigestAuth do
     cnonce = :crypto.strong_rand_bytes(16) |> md5
     url = URI.parse(url)
     response = create_digest_response(
-                username,
-                password,
-                realm,
-                digest_head |> Map.get("qop"),
-                url.path,
-                nonce,
-                cnonce)
-      [{"username", username},
-       {"realm", realm},
-       {"nonce", nonce},
-       {"uri", url.path},
-       {"cnonce", cnonce},
-       {"response", response}]
-      |> add_opaque(digest_head |> Map.get("opaque"))
-      |> Enum.map(fn {key, val} -> {key, "\"#{val}\""} end)
-      |> add_nonce_counter
-      |> add_auth(digest_head |> Map.get("qop"))
-      |> Enum.map(fn {key, val} -> "#{key}=#{val}" end)
-      |> Enum.join(", ")
+      username,
+      password,
+      realm,
+      digest_head |> Map.get("qop"),
+      url.path,
+      nonce,
+      cnonce
+    )
+    [{"username", username},
+     {"realm", realm},
+     {"nonce", nonce},
+     {"uri", url.path},
+     {"cnonce", cnonce},
+     {"response", response}]
+    |> add_opaque(digest_head |> Map.get("opaque"))
+    |> Enum.map(fn {key, val} -> {key, "\"#{val}\""} end)
+    |> add_nonce_counter
+    |> add_auth(digest_head |> Map.get("qop"))
+    |> Enum.map(fn {key, val} -> "#{key}=#{val}" end)
+    |> Enum.join(", ")
   end
 
   defp parse_digest_header(auth_head) do
     cond do
-      parsed = Regex.scan(~r/(\w+\s*)=\"([\w=\s\\]+)/, auth_head) ->
-        parsed
-        |> Enum.map(fn [_, key, val] -> {key, val} end)
-        |> Enum.into(%{})
+      parsed = Regex.scan(~r/(\w+\s*)=\"([\w=\s\\]+)/, auth_head) -> parsed
+      |> Enum.map(fn [_, key, val] -> {key, val} end)
+      |> Enum.into(%{})
       true -> raise "Error in digest authentication header: #{auth_head}"
     end
   end

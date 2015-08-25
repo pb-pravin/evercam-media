@@ -41,7 +41,6 @@ defmodule EvercamMedia.Mixfile do
   defp elixirc_paths(:test), do: ["lib", "web", "test/support"]
   defp elixirc_paths(_),     do: ["lib", "web"]
 
-
   defp deps do
     [{:phoenix, "~> 0.13"},
      {:phoenix_ecto, "~> 0.4"},

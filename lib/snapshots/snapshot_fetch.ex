@@ -29,11 +29,12 @@ defmodule EvercamMedia.Snapshot do
     try do
       [username, password] = String.split(args[:auth], ":")
       vendor_exid = Camera.get_vendor_exid_by_camera_exid(args[:camera_id])
-      response = case vendor_exid do
-        "samsung" -> HTTPClient.get(:digest_auth, args[:url], username, password)
-        "ubiquiti" -> HTTPClient.get(:cookie_auth, args[:url], username, password)
-        _ -> HTTPClient.get(:basic_auth, args[:url], username, password)
-      end
+      response =
+        case vendor_exid do
+          "samsung" -> HTTPClient.get(:digest_auth, args[:url], username, password)
+          "ubiquiti" -> HTTPClient.get(:cookie_auth, args[:url], username, password)
+          _ -> HTTPClient.get(:basic_auth, args[:url], username, password)
+        end
       response = response.body
       check_jpg(response)
       broadcast_snapshot(args[:camera_id], response)
@@ -75,11 +76,11 @@ defmodule EvercamMedia.Snapshot do
         Logger.warn "Postgrex Error: #{error.postgres[:message]}"
       _error ->
         :timer.sleep 1_000
-        error_handler(_error)
-        Logger.warn "Retrying S3 upload for camera '#{camera_id}', try ##{count}"
-        if count < 10 do
-          store(camera_id, image, notes, count+1)
-        end
+      error_handler(_error)
+      Logger.warn "Retrying S3 upload for camera '#{camera_id}', try ##{count}"
+      if count < 10 do
+        store(camera_id, image, notes, count+1)
+      end
     end
   end
 

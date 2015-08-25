@@ -3,8 +3,7 @@ defmodule EvercamMedia.ONVIFPTZControllerTest do
 
   test "GET /v1/cameras/:id/ptz/presets, gives something" do
     conn = get conn(), "/v1/cameras/mobile-mast-test/ptz/presets"
-    assert json_response(conn, 200) 
-           |> Map.get("Presets") != nil
+    presets = json_response(conn, 200) |> Map.get("Presets")
+    assert presets != nil
   end
-
 end
