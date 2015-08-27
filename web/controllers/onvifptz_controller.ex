@@ -81,13 +81,22 @@ defmodule EvercamMedia.ONVIFPTZController do
 
   def relativemove(conn, params) do
     [url, username, password] = get_camera_info(params["id"])
-    x = max(Map.get(params, "left", "0"), Map.get(params, "right","0")) |> String.to_integer
-    y = max(Map.get(params, "up", "0"), Map.get(params, "down","0")) |> String.to_integer
+
+    left = Map.get(params, "left", "0") |> String.to_integer
+    right = Map.get(params, "right", "0") |> String.to_integer
+		up = Map.get(params, "up", "0") |> String.to_integer
+    down = Map.get(params, "down", "0") |> String.to_integer
     zoom = Map.get(params, "zoom", "0") |> String.to_integer
-    # If x value comes from "left" parameter make it negative
-    x = if Map.get(params, "left") == nil do x else -x end
-    # If y value comes from down make it negative
-    y = if Map.get(params, "up") == nil do y else -y end
+    x =
+      cond do 
+        right > left -> right
+        true -> -left
+      end
+    y = 
+      cond do
+        down > up -> down
+        true -> -up
+      end
     {:ok, response} = ONVIFPTZ.relative_move(
       url, username,
       password, "Profile_1",
