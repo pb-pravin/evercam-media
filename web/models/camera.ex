@@ -11,6 +11,7 @@ defmodule Camera do
 
     field :exid, :string
     field :name, :string
+    field :timezone, :string
     field :thumbnail_url, :string
     field :is_online, :boolean
     field :is_public, :boolean
