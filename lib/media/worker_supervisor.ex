@@ -29,15 +29,22 @@ defmodule EvercamMedia.Worker.Supervisor do
   end
 
   def start_camera_worker(camera) do
+    camera = EvercamMedia.Repo.preload camera, :cloud_recordings
     url = "#{Camera.external_url(camera)}#{Camera.res_url(camera, "jpg")}"
     auth = Camera.auth(camera)
     frequent = Camera.recording?(camera)
     sleep = :crypto.rand_uniform(1, 60) * 1000
 
     unless String.length(url) == 0 do
-      EvercamMedia.Worker.Supervisor.start_child(
-        [camera_id: camera.exid, url: url, auth: auth, frequent: frequent, initial_sleep: sleep]
-      )
+      EvercamMedia.Worker.Supervisor.start_child([
+        camera_id: camera.exid,
+        schedule: Camera.schedule(camera),
+        timezone: camera.timezone,
+        url: url,
+        auth: auth,
+        frequent: frequent,
+        initial_sleep: sleep
+      ])
     end
   end
 end

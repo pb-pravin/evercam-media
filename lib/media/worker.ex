@@ -1,5 +1,6 @@
 defmodule EvercamMedia.Worker do
   import EvercamMedia.Snapshot
+  import EvercamMedia.Schedule
 
   def start_link(args) do
     IO.puts("Starting camera worker '#{args[:camera_id]}'")
@@ -18,8 +19,9 @@ defmodule EvercamMedia.Worker do
       :timer.sleep(60_000 + args[:initial_sleep])
       args = Dict.put(args, :initial_sleep, 0)
     end
-
-    Task.async(fn -> check_camera(args) end)
+    if scheduled?(args[:schedule], args[:timezone]) do
+      Task.async(fn -> check_camera(args) end)
+    end
     loop(args)
   end
 end
