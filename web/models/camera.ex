@@ -24,10 +24,10 @@ defmodule Camera do
 
   def get_vendor_exid_by_camera_exid(camera_id) do
     EvercamMedia.Repo.one from c in Camera,
-           join: vm in assoc(c, :vendor_model),
-           join: v in assoc(vm, :vendor),
-           where: c.exid == ^camera_id,
-           select: v.exid
+    join: vm in assoc(c, :vendor_model),
+    join: v in assoc(vm, :vendor),
+    where: c.exid == ^camera_id,
+    select: v.exid
   end
 
   def by_exid(camera_id) do
@@ -79,7 +79,7 @@ defmodule Camera do
     end
   end
 
-  def recording?(camera) do
+  def recording?(camera_with_recordings) do
     recording_cameras = [
       "bankers",
       "beefcammobile",
@@ -120,12 +120,28 @@ defmodule Camera do
       "zipyard-ranelagh-foh"
     ]
 
-    camera = EvercamMedia.Repo.preload camera, :cloud_recordings
-    cloud_recording = List.first(camera.cloud_recordings)
+    cloud_recording = List.first(camera_with_recordings.cloud_recordings)
     if cloud_recording == nil do
       false
     else
       cloud_recording.frequency == 60
+    end
+  end
+
+  def schedule(camera_with_recordings) do
+    cloud_recording = List.first(camera_with_recordings.cloud_recordings)
+    if cloud_recording == nil do
+      %{
+        "Monday" => ["00:00-24:00"],
+        "Tuesday" => ["00:00-24:00"],
+        "Wednesday" => ["00:00-24:00"],
+        "Thursday" => ["00:00-24:00"],
+        "Friday" => ["00:00-24:00"],
+        "Saturday" => ["00:00-24:00"],
+        "Sunday" => ["00:00-24:00"],
+      }
+    else
+      cloud_recording.schedule
     end
   end
 end
