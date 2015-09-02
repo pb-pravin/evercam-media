@@ -62,7 +62,7 @@ defmodule EvercamMedia.Snapshot do
   def store(camera_id, image, notes \\ "", count \\ 1) do
     try do
       snap_timestamp = Ecto.DateTime.utc
-      file_timestamp = Timex.Date.convert Timex.Date.now, :secs
+      file_timestamp = Timex.Date.now(:secs)
       file_path = "/#{camera_id}/snapshots/#{file_timestamp}.jpg"
 
       update_camera_status(camera_id, snap_timestamp, true)
