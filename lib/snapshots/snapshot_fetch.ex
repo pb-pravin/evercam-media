@@ -13,22 +13,21 @@ defmodule EvercamMedia.Snapshot do
   def check_camera(args, retry \\ true) do
     try do
       [username, password] = String.split(args[:auth], ":")
-      vendor_exid = Camera.get_vendor_exid_by_camera_exid(args[:camera_id])
       response =
-        case vendor_exid do
+        case args[:vendor_exid] do
           "samsung" -> HTTPClient.get(:digest_auth, args[:url], username, password)
           "ubiquiti" -> HTTPClient.get(:cookie_auth, args[:url], username, password)
           _ -> HTTPClient.get(:basic_auth, args[:url], username, password)
         end
       response = response.body
       check_jpg(response)
-      broadcast_snapshot(args[:camera_id], response)
-      store(args[:camera_id], response, "Evercam Proxy")
+      broadcast_snapshot(args[:camera_exid], response)
+      store(args[:camera_exid], args[:camera_id], response, "Evercam Proxy")
     rescue
       error in [FunctionClauseError] ->
         error_handler(error)
       error in [SnapshotError] ->
-        Logger.info "#{error.message} for camera '#{args[:camera_id]}'"
+        Logger.info "#{error.message} for camera '#{args[:camera_exid]}'"
       error in [HTTPotion.HTTPError] ->
         case error.message do
           "req_timedout" ->
@@ -37,35 +36,35 @@ defmodule EvercamMedia.Snapshot do
             end
           _message ->
             timestamp = Ecto.DateTime.utc
-            update_camera_status(args[:camera_id], timestamp, false)
+            update_camera_status(args[:camera_exid], timestamp, false)
         end
       _error ->
         error_handler(_error)
     end
   end
 
-  def store(camera_id, image, notes \\ "", count \\ 1) do
+  def store(camera_exid, camera_id, image, notes \\ "", count \\ 1) do
     try do
       snap_timestamp = Ecto.DateTime.utc
       file_timestamp = Timex.Date.now(:secs)
-      file_path = "/#{camera_id}/snapshots/#{file_timestamp}.jpg"
+      file_path = "/#{camera_exid}/snapshots/#{file_timestamp}.jpg"
 
-      update_camera_status(camera_id, snap_timestamp, true)
-      S3.upload(camera_id, image, file_path, file_timestamp)
-      save_snapshot_record(camera_id, notes, snap_timestamp, file_timestamp, S3.exists?(file_path), file_path)
-      ConCache.put(:cache, camera_id, %{image: image, timestamp: file_timestamp, notes: notes})
-      Logger.info "Uploaded snapshot '#{file_timestamp}' for camera '#{camera_id}'"
-      %{camera_id: camera_id, image: image, timestamp: file_timestamp, notes: notes}
+      update_camera_status(camera_exid, snap_timestamp, true)
+      S3.upload(camera_exid, image, file_path, file_timestamp)
+      save_snapshot_record(camera_exid, camera_id, notes, snap_timestamp, file_timestamp, true, file_path)
+      ConCache.put(:cache, camera_exid, %{image: image, timestamp: file_timestamp, notes: notes})
+      Logger.info "Uploaded snapshot '#{file_timestamp}' for camera '#{camera_exid}'"
+      %{camera_id: camera_exid, image: image, timestamp: file_timestamp, notes: notes}
     rescue
       error in [Postgrex.Error] ->
         Logger.warn "Postgrex Error: #{error.postgres[:message]}"
       _error ->
         :timer.sleep 1_000
-      error_handler(_error)
-      Logger.warn "Retrying S3 upload for camera '#{camera_id}', try ##{count}"
-      if count < 10 do
-        store(camera_id, image, notes, count+1)
-      end
+        error_handler(_error)
+        Logger.warn "Retrying S3 upload for camera '#{camera_id}', try ##{count}"
+        if count < 10 do
+          store(camera_exid, image, notes, count+1)
+        end
     end
   end
 
@@ -80,30 +79,29 @@ defmodule EvercamMedia.Snapshot do
     Logger.error Exception.format_stacktrace System.stacktrace
   end
 
-  def save_snapshot_record(camera_id, _, _, file_timestamp, _, _, count) when count >= 10 do
-    Logger.error "Snapshot '#{file_timestamp}' for '#{camera_id}' not found on S3, aborting."
+  def save_snapshot_record(camera_exid, camera_id, _, _, file_timestamp, _, _, count) when count >= 10 do
+    Logger.error "Snapshot '#{file_timestamp}' for '#{camera_exid}' not found on S3, aborting."
   end
 
-  def save_snapshot_record(camera_id, notes, snap_timestamp, file_timestamp, true, file_path, _) do
-    camera = Repo.one! Camera.by_exid(camera_id)
-    Repo.insert %Snapshot{camera_id: camera.id, data: "S3", notes: notes, created_at: snap_timestamp}
-    update_thumbnail_url(camera_id, file_path)
+  def save_snapshot_record(camera_exid, camera_id, notes, snap_timestamp, file_timestamp, true, file_path, _) do
+    Repo.insert %Snapshot{camera_id: camera_id, data: "S3", notes: notes, created_at: snap_timestamp}
+    update_thumbnail_url(camera_exid, file_path)
   end
 
-  def save_snapshot_record(camera_id, notes, snap_timestamp, file_timestamp, false, file_path, count \\ 0) when count < 10 do
-    Logger.warn "Snapshot '#{file_timestamp}' for '#{camera_id}' not found on S3, try ##{count}"
+  def save_snapshot_record(camera_exid, camera_id, notes, snap_timestamp, file_timestamp, false, file_path, count \\ 0) when count < 10 do
+    Logger.warn "Snapshot '#{file_timestamp}' for '#{camera_exid}' not found on S3, try ##{count}"
     :timer.sleep 1000
-    save_snapshot_record(camera_id, notes, snap_timestamp, file_timestamp, S3.exists?(file_path), file_path, count + 1)
+    save_snapshot_record(camera_exid, camera_id, notes, snap_timestamp, file_timestamp, S3.exists?(file_path), file_path, count + 1)
   end
 
-  def update_thumbnail_url(camera_id, file_path) do
+  def update_thumbnail_url(camera_exid, file_path) do
     camera = Repo.one! Camera.by_exid(camera_id)
     camera = %{camera | thumbnail_url: S3.file_url(file_path)}
     Repo.update camera
   end
 
-  def update_camera_status(camera_id, timestamp, status) do
-    camera = Repo.one! Camera.by_exid(camera_id)
+  def update_camera_status(camera_exid, timestamp, status) do
+    camera = Repo.one! Camera.by_exid(camera_exid)
     camera_is_online = camera.is_online
     camera = construct_camera(camera, timestamp, status, camera_is_online == status)
     Repo.update camera
@@ -115,16 +113,16 @@ defmodule EvercamMedia.Snapshot do
         _error ->
           error_handler(_error)
       end
-      invalidate_cache(camera_id)
+      invalidate_cache(camera_exid)
     end
   end
 
-  def invalidate_cache(camera_id) do
+  def invalidate_cache(camera_exid) do
     Exq.Enqueuer.enqueue(
       :exq_enqueuer,
       "cache",
       "Evercam::CacheInvalidationWorker",
-      camera_id
+      camera_exid
     )
   end
 
