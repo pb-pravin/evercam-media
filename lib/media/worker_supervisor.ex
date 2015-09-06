@@ -29,7 +29,7 @@ defmodule EvercamMedia.Worker.Supervisor do
     |> Enum.map(&(start_camera_worker &1))
   end
 
-  def start_camera_worker(camera) do
+  def start_camera_worker(camera_with_index) do
     {camera, index } = camera_with_index
     camera = EvercamMedia.Repo.preload camera, :cloud_recordings
     url = "#{Camera.external_url(camera)}#{Camera.res_url(camera, "jpg")}"

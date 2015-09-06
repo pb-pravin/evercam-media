@@ -95,7 +95,7 @@ defmodule EvercamMedia.Snapshot do
   end
 
   def update_thumbnail_url(camera_exid, file_path) do
-    camera = Repo.one! Camera.by_exid(camera_id)
+    camera = Repo.one! Camera.by_exid(camera_exid)
     camera = %{camera | thumbnail_url: S3.file_url(file_path)}
     Repo.update camera
   end

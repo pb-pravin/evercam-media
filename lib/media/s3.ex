@@ -28,7 +28,7 @@ defmodule EvercamMedia.S3 do
       "Authorization": authorization
     ]
 
-    case HTTPoison.put(url, body, headers) do
+    case HTTPoison.put(url, image, headers) do
       {:error, httpotion_response} ->
         %HTTPoison.Error{reason: reason} = httpotion_response
         Logger.error "error #{reason}"
