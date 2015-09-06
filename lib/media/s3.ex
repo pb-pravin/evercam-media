@@ -13,27 +13,28 @@ defmodule EvercamMedia.S3 do
   end
 
   def upload(camera_id, image, file_path, timestamp) do
-    # TODO: replace this with a proper uploading method
-    # using http requests from elixir (hackney?)
+    date = Calendar.DateTime.now!("UTC") |> Calendar.DateTime.Format.httpdate
+    host = "#{System.get_env("AWS_BUCKET")}.s3.amazonaws.com"
+    url = "#{host}#{file_path}"
+    content_type = "image/jpeg"
+    string = "PUT\n\n#{content_type}\n#{date}\n/#{System.get_env("AWS_BUCKET")}#{file_path}"
+    signature = :crypto.hmac(:sha, "#{System.get_env("AWS_SECRET_KEY")}", string) |> Base.encode64
+    authorization = "AWS #{System.get_env("AWS_ACCESS_KEY")}:#{signature}"
 
-    tmp_path = "/tmp/#{camera_id}-#{timestamp}.jpg"
-    File.write! tmp_path, image
-    command = "
-      s3_put.sh \
-      #{System.get_env("AWS_ACCESS_KEY")} \
-      #{System.get_env("AWS_SECRET_KEY")} \
-      #{System.get_env("AWS_BUCKET")} \
-      #{tmp_path} \
-      #{file_path}
-    "
-    output = Porcelain.shell(command)
+    headers = [
+      "Host": host,
+      "Date": date,
+      "Content-Type": content_type,
+      "Authorization": authorization
+    ]
 
-    if output.err || output.status != 0 do
-      raise HTTPotion.HTTPError, message: inspect(output.err)
+    case HTTPoison.put(url, body, headers) do
+      {:error, httpotion_response} ->
+        %HTTPoison.Error{reason: reason} = httpotion_response
+        Logger.error "error #{reason}"
+      _ ->
+        Logger.info "uploaded #{file_path}"
     end
-
-    File.rm tmp_path
-    :timer.sleep 1000
   end
 
   def exists?(file_name) do
