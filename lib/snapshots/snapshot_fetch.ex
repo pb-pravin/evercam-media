@@ -4,21 +4,6 @@ defmodule EvercamMedia.Snapshot do
   alias EvercamMedia.HTTPClient
   require Logger
 
-  def fetch(url, ":") do
-    HTTPotion.get(url).body
-  end
-
-  def fetch(url, auth) do
-    [username, password] = String.split(auth, ":")
-    request = HTTPotion.get(url, [basic_auth: {username, password}])
-    if request.status_code == 401 do
-      digest_request = Porcelain.shell("curl --max-time 15 --digest --user '#{auth}' #{url}")
-      digest_request.out
-    else
-      request.body
-    end
-  end
-
   def fallback do
     path = Application.app_dir(:evercam_media)
     path = Path.join path, "priv/static/images/unavailable.jpg"
