@@ -20,7 +20,7 @@ defmodule EvercamMedia.Worker do
       args = Dict.put(args, :initial_sleep, 0)
     end
     if scheduled?(args[:schedule], args[:timezone]) do
-      Task.async(fn -> check_camera(args) end) |> Task.await(30_000)
+      Task.start(fn -> check_camera(args) end)
     end
     loop(args)
   end
