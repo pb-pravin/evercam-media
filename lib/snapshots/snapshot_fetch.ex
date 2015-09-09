@@ -11,60 +11,42 @@ defmodule EvercamMedia.Snapshot do
   end
 
   def check_camera(args, retry \\ true) do
-    try do
-      [username, password] = String.split(args[:auth], ":")
-      response =
-        case args[:vendor_exid] do
-          "samsung" -> HTTPClient.get(:digest_auth, args[:url], username, password)
-          "ubiquiti" -> HTTPClient.get(:cookie_auth, args[:url], username, password)
-          _ -> HTTPClient.get(:basic_auth, args[:url], username, password)
-        end
-      response = response.body
-      check_jpg(response)
-      broadcast_snapshot(args[:camera_exid], response)
-      store(args[:camera_exid], args[:camera_id], response, "Evercam Proxy")
-    rescue
-      error in [FunctionClauseError] ->
-        error_handler(error)
-      error in [SnapshotError] ->
-        Logger.info "#{error.message} for camera '#{args[:camera_exid]}'"
-      error in [HTTPotion.HTTPError] ->
-        case error.message do
-          "req_timedout" ->
-            if retry do
-              check_camera(args, false)
-            end
-          _message ->
-            timestamp = Ecto.DateTime.utc
-            update_camera_status(args[:camera_exid], timestamp, false)
-        end
-      _error ->
-        error_handler(_error)
-    end
+    [username, password] = String.split(args[:auth], ":")
+    response =
+      case args[:vendor_exid] do
+        "samsung" -> HTTPClient.get(:digest_auth, args[:url], username, password)
+        "ubiquiti" -> HTTPClient.get(:cookie_auth, args[:url], username, password)
+        _ -> HTTPClient.get(:basic_auth, args[:url], username, password)
+      end
+    response = response.body
+    timestamp = Ecto.DateTime.utc
+    check_jpg(response, args[:camera_exid], timestamp)
+    broadcast_snapshot(args[:camera_exid], response)
+    store(args[:camera_exid], args[:camera_id], response, "Evercam Proxy")
   end
 
   def store(camera_exid, camera_id, image, notes \\ "", count \\ 1) do
-    try do
-      snap_timestamp = Ecto.DateTime.utc
-      file_timestamp = Timex.Date.now(:secs)
-      file_path = "/#{camera_exid}/snapshots/#{file_timestamp}.jpg"
+    snap_timestamp = Ecto.DateTime.utc
+    file_timestamp = Timex.Date.now(:secs)
+    file_path = "/#{camera_exid}/snapshots/#{file_timestamp}.jpg"
+    response =  S3.upload(camera_exid, image, file_path, file_timestamp)
+    case response do
+      {:error, httpotion_response} ->
+        %HTTPoison.Error{reason: reason} = httpotion_response
+        Logger.error "Error uploading file to S3:  #{reason}"
+      _ ->
+        Logger.info "Uploaded file to S3 for camera #{camera_exid}: #{file_path}"
+    end
 
-      update_camera_status(camera_exid, snap_timestamp, true)
-      S3.upload(camera_exid, image, file_path, file_timestamp)
-      save_snapshot_record(camera_exid, camera_id, notes, snap_timestamp, file_timestamp, true, file_path)
-      ConCache.put(:cache, camera_exid, %{image: image, timestamp: file_timestamp, notes: notes})
-      Logger.info "Uploaded snapshot '#{file_timestamp}' for camera '#{camera_exid}'"
-      %{camera_id: camera_exid, image: image, timestamp: file_timestamp, notes: notes}
-    rescue
-      error in [Postgrex.Error] ->
-        Logger.warn "Postgrex Error: #{error.postgres[:message]}"
-      _error ->
-        :timer.sleep 1_000
-        error_handler(_error)
-        Logger.warn "Retrying S3 upload for camera '#{camera_id}', try ##{count}"
-        if count < 10 do
-          store(camera_exid, image, notes, count+1)
-        end
+    update_camera_status(camera_exid, snap_timestamp, true)
+    save_snapshot_record(camera_exid, camera_id, notes, snap_timestamp, file_timestamp, true, file_path)
+    ConCache.put(:cache, camera_exid, %{image: image, timestamp: file_timestamp, notes: notes})
+    %{camera_id: camera_exid, image: image, timestamp: file_timestamp, notes: notes}
+  end
+
+  def check_jpg(response, camera_exid, timestamp) do
+    if String.valid?(response) do
+      update_camera_status(camera_exid, timestamp, false)
     end
   end
 
