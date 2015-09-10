@@ -35,9 +35,9 @@ defmodule EvercamMedia.Worker.Supervisor do
     url = "#{Camera.external_url(camera)}#{Camera.res_url(camera, "jpg")}"
     parsed_uri = URI.parse url
     auth = Camera.auth(camera)
-    frequent = Camera.recording?(camera)
     vendor_exid = Camera.get_vendor_exid_by_camera_exid(camera.exid)
-    sleep = 0 #:crypto.rand_uniform(1, 60) * 1000
+    sleep = Camera.sleep(camera)
+    initial_sleep = :crypto.rand_uniform(1, 60) * 1000
 
     unless parsed_uri.host == nil do
       EvercamMedia.Worker.Supervisor.start_child([
@@ -49,8 +49,8 @@ defmodule EvercamMedia.Worker.Supervisor do
         timezone: camera.timezone,
         url: url,
         auth: auth,
-        frequent: frequent,
-        initial_sleep: sleep
+        sleep: sleep,
+        initial_sleep: initial_sleep
       ])
     end
   end
