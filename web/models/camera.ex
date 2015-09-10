@@ -145,6 +145,15 @@ defmodule Camera do
     end
   end
 
+  def initial_sleep(camera_with_recordings) do
+    cloud_recording = List.first(camera_with_recordings.cloud_recordings)
+    if cloud_recording == nil || cloud_recording.frequency == 1 do
+      :crypto.rand_uniform(1, 60) * 1000
+    else
+      1000
+    end
+  end
+
   def sleep(camera_with_recordings) do
     cloud_recording = List.first(camera_with_recordings.cloud_recordings)
     if cloud_recording == nil do

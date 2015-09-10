@@ -37,7 +37,7 @@ defmodule EvercamMedia.Worker.Supervisor do
     auth = Camera.auth(camera)
     vendor_exid = Camera.get_vendor_exid_by_camera_exid(camera.exid)
     sleep = Camera.sleep(camera)
-    initial_sleep = :crypto.rand_uniform(1, 60) * 1000
+    initial_sleep = Camera.initial_sleep(camera)
 
     unless parsed_uri.host == nil do
       EvercamMedia.Worker.Supervisor.start_child([
