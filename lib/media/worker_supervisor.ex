@@ -23,21 +23,28 @@ defmodule EvercamMedia.Worker.Supervisor do
   end
 
   def initiate_workers do
-    EvercamMedia.Repo.all(Camera)
-    # |> Enum.filter(&(Camera.recording? &1))
+    Camera
+    |> EvercamMedia.Repo.all([timeout: 15000])
+    |> Enum.with_index # Useful for debugging how many camera workers have been started.
     |> Enum.map(&(start_camera_worker &1))
   end
 
-  def start_camera_worker(camera) do
+  def start_camera_worker(camera_with_index) do
+    {camera, index } = camera_with_index
     camera = EvercamMedia.Repo.preload camera, :cloud_recordings
     url = "#{Camera.external_url(camera)}#{Camera.res_url(camera, "jpg")}"
+    parsed_uri = URI.parse url
     auth = Camera.auth(camera)
     frequent = Camera.recording?(camera)
-    sleep = :crypto.rand_uniform(1, 60) * 1000
+    vendor_exid = Camera.get_vendor_exid_by_camera_exid(camera.exid)
+    sleep = 0 #:crypto.rand_uniform(1, 60) * 1000
 
-    unless String.length(url) == 0 do
+    unless parsed_uri.host == nil do
       EvercamMedia.Worker.Supervisor.start_child([
-        camera_id: camera.exid,
+        index: index + 1,
+        camera_id: camera.id,
+        camera_exid: camera.exid,
+        vendor_exid: vendor_exid,
         schedule: Camera.schedule(camera),
         timezone: camera.timezone,
         url: url,

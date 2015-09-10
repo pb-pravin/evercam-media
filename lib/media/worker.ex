@@ -3,8 +3,8 @@ defmodule EvercamMedia.Worker do
   import EvercamMedia.Schedule
 
   def start_link(args) do
-    IO.puts("Starting camera worker '#{args[:camera_id]}'")
-    worker_name = args[:camera_id] |> String.to_atom
+    IO.puts("Starting camera worker '#{args[:camera_exid]}'")
+    worker_name = args[:camera_exid] |> String.to_atom
     GenServer.start_link(__MODULE__, args, name: worker_name)
   end
 
