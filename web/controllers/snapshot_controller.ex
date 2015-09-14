@@ -85,6 +85,7 @@ defmodule EvercamMedia.SnapshotController do
     try do
       [url, auth, credentials, time, _] = decode_request_token(token)
       [username, password] = String.split(auth, ":")
+      camera = Camera.by_exid(camera_id) |> EvercamMedia.Repo.one
       vendor_exid = Camera.get_vendor_exid_by_camera_exid(camera_id)
       response = case vendor_exid do
         "samsung" -> HTTPClient.get(:digest_auth, url, username, password)
@@ -95,7 +96,7 @@ defmodule EvercamMedia.SnapshotController do
       data = response.body
       check_jpg(data)
       broadcast_snapshot(camera_id, data)
-      response = store(camera_id, data, notes)
+      response = store(camera_id, camera.id , data, "Evercam Proxy")
 
       [200, response]
     rescue
