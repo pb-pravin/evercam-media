@@ -47,6 +47,7 @@ defmodule EvercamMedia.Snapshot do
   def check_jpg(response, camera_exid, timestamp) do
     if String.valid?(response) do
       update_camera_status(camera_exid, timestamp, false)
+      raise SnapshotError
     end
   end
 
