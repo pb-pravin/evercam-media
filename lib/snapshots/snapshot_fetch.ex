@@ -32,6 +32,7 @@ defmodule EvercamMedia.Snapshot do
   end
 
   def deal_with_camera_error_http(args, error) do
+    timestamp = Ecto.DateTime.utc
     case error.message do
       "nxdomain" ->
         pid = args[:camera_exid] |> String.to_atom |> Process.whereis
@@ -41,8 +42,8 @@ defmodule EvercamMedia.Snapshot do
         Logger.error "Request timeout for camera #{args[:camera_exid]}"
       "econnrefused" ->
         Logger.error "Connection refused for camera #{args[:camera_exid]}"
+        update_camera_status(args[:camera_exid], timestamp, false)
        _ ->
-         timestamp = Ecto.DateTime.utc
          update_camera_status(args[:camera_exid], timestamp, false)
          Logger.error "Unhandled HTTPError #{inspect error}"
     end
