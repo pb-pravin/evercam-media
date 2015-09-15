@@ -11,7 +11,7 @@ defmodule EvercamMedia.Worker.Supervisor do
     end
 
     supervise(
-      [worker(EvercamMedia.Worker, [], [restart: :permanent, shutdown: :infinity])],
+      [worker(EvercamMedia.Worker, [], [restart: :transient, shutdown: :infinity])],
       strategy: :simple_one_for_one,
       max_restarts: 1_000_000,
       max_seconds: 1_000_000

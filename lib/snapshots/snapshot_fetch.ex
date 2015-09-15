@@ -11,18 +11,57 @@ defmodule EvercamMedia.Snapshot do
   end
 
   def check_camera(args, retry \\ true) do
-    [username, password] = String.split(args[:auth], ":")
-    response =
-      case args[:vendor_exid] do
-        "samsung" -> HTTPClient.get(:digest_auth, args[:url], username, password)
-        "ubiquiti" -> HTTPClient.get(:cookie_auth, args[:url], username, password)
-        _ -> HTTPClient.get(:basic_auth, args[:url], username, password)
-      end
-    response = response.body
+    case fetch_snapshot(args) do
+      {:ok, response} ->
+        image = response.body
+        check_jpg(response)
+        broadcast_snapshot(args[:camera_exid], image)
+        store(args[:camera_exid], args[:camera_id], image, "Evercam Proxy")
+      {:error, error} ->
+         deal_with_camera_error(args, error)
+    end
+  end
+
+  def deal_with_camera_error(args, error) do
+    case error do
+      %HTTPotion.HTTPError{} ->
+        deal_with_camera_error_http(args, error)
+      _ ->
+        Logger.error "Unhandled error #{inspect error}"
+    end
+  end
+
+  def deal_with_camera_error_http(args, error) do
     timestamp = Ecto.DateTime.utc
-    check_jpg(response, args[:camera_exid], timestamp)
-    broadcast_snapshot(args[:camera_exid], response)
-    store(args[:camera_exid], args[:camera_id], response, "Evercam Proxy")
+    case error.message do
+      "nxdomain" ->
+        pid = args[:camera_exid] |> String.to_atom |> Process.whereis
+        Logger.info "Shutting down worker for camera #{args[:camera_exid]} - nxdomain"
+        Process.exit pid, :shutdown
+      "req_timedout" ->
+        Logger.error "Request timeout for camera #{args[:camera_exid]}"
+      "econnrefused" ->
+        Logger.error "Connection refused for camera #{args[:camera_exid]}"
+        update_camera_status(args[:camera_exid], timestamp, false)
+       _ ->
+         update_camera_status(args[:camera_exid], timestamp, false)
+         Logger.error "Unhandled HTTPError #{inspect error}"
+    end
+  end
+
+  def fetch_snapshot(args) do
+    [username, password] = String.split(args[:auth], ":")
+    try do
+      response =
+        case args[:vendor_exid] do
+          "samsung" -> HTTPClient.get(:digest_auth, args[:url], username, password)
+          "ubiquiti" -> HTTPClient.get(:cookie_auth, args[:url], username, password)
+          _ -> HTTPClient.get(:basic_auth, args[:url], username, password)
+        end
+      {:ok, response}
+    rescue
+      error -> {:error, error}
+    end
   end
 
   def store(camera_exid, camera_id, image, notes \\ "", count \\ 1) do
@@ -42,12 +81,6 @@ defmodule EvercamMedia.Snapshot do
     save_snapshot_record(camera_exid, camera_id, notes, snap_timestamp, file_timestamp, true, file_path)
     ConCache.put(:cache, camera_exid, %{image: image, timestamp: file_timestamp, notes: notes})
     %{camera_id: camera_exid, image: image, timestamp: file_timestamp, notes: notes}
-  end
-
-  def check_jpg(response, camera_exid, timestamp) do
-    if String.valid?(response) do
-      update_camera_status(camera_exid, timestamp, false)
-    end
   end
 
   def check_jpg(response) do
