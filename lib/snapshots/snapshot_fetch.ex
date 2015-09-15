@@ -78,7 +78,7 @@ defmodule EvercamMedia.Snapshot do
     end
 
     update_camera_status(camera_exid, snap_timestamp, true)
-    save_snapshot_record(camera_exid, camera_id, notes, snap_timestamp, file_timestamp, true, file_path)
+    save_snapshot_record(camera_exid, camera_id, notes, snap_timestamp, file_timestamp, file_path)
     ConCache.put(:cache, camera_exid, %{image: image, timestamp: file_timestamp, notes: notes})
     %{camera_id: camera_exid, image: image, timestamp: file_timestamp, notes: notes}
   end
@@ -94,19 +94,9 @@ defmodule EvercamMedia.Snapshot do
     Logger.error Exception.format_stacktrace System.stacktrace
   end
 
-  def save_snapshot_record(camera_exid, camera_id, _, _, file_timestamp, _, _, count) when count >= 10 do
-    Logger.error "Snapshot '#{file_timestamp}' for '#{camera_exid}' not found on S3, aborting."
-  end
-
-  def save_snapshot_record(camera_exid, camera_id, notes, snap_timestamp, file_timestamp, true, file_path, _) do
+  def save_snapshot_record(camera_exid, camera_id, notes, snap_timestamp, file_timestamp, file_path, _) do
     Repo.insert %Snapshot{camera_id: camera_id, data: "S3", notes: notes, created_at: snap_timestamp}
     update_thumbnail_url(camera_exid, file_path)
-  end
-
-  def save_snapshot_record(camera_exid, camera_id, notes, snap_timestamp, file_timestamp, false, file_path, count \\ 0) when count < 10 do
-    Logger.warn "Snapshot '#{file_timestamp}' for '#{camera_exid}' not found on S3, try ##{count}"
-    :timer.sleep 1000
-    save_snapshot_record(camera_exid, camera_id, notes, snap_timestamp, file_timestamp, S3.exists?(file_path), file_path, count + 1)
   end
 
   def update_thumbnail_url(camera_exid, file_path) do
